@@ -1,0 +1,85 @@
+
+R version 3.3.3 (2017-03-06) -- "Another Canoe"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> #--------------------------------
+> # coastal-age-distributions.R
+> #
+> # summarize age distribution
+> # by community
+> #--------------------------------
+> 
+> #--------------------------------
+> # preamble
+> #--------------------------------
+> rm(list=ls())
+> 
+> #--------------------------------
+> # load the formatted dataset
+> #--------------------------------
+> load("~/dropbox/coastalkenya/data/final/coastal_kenya.RData")
+> d <- coastal_kenya
+> 
+> 
+> pdf("~/dropbox/coastalkenya/results/figs/coastal-age-dists.pdf",width=5,height=10)
+> lo <- layout(mat=matrix(1:12,nrow=6,ncol=2,byrow=T))
+> op <- par(mar=c(4,4,2,1)+0.1)
+> 
+> # each village
+> vnames <- unique(d$cname[order(d$community)])
+> for(i in 1:10) {
++   hist(d$age[d$community==i],
++        breaks=0:100,
++        main="",
++        xlim=c(0,100),ylim=c(0,20),
++        col="gray70",border=NA,
++        xlab="",ylab="",
++        las=1)
++   mtext(paste(vnames[i]," (n= ",length(d$age[d$community==i]),")",sep=""),side=3,line=0.5,at=0,adj=0)
++   if(i %in% c(1,3,5,7,9)) {
++     mtext("N",side=2,line=3,las=1,cex=0.75) 
++   }
++   if(i %in% c(10)) {
++     mtext("Age, years",side=1,line=2.5,las=1,cex=0.75) 
++   }
++ 
++ }
+> 
+> # all villages
+> hist(d$age,
++      breaks=0:100,
++      main="",
++      xlim=c(0,100),ylim=c(0,140),
++      col="gray70",border=NA,
++      xlab="",ylab="",
++      las=1)
+> mtext(paste("All communities (n= ",length(d$age),")",sep=""),side=3,line=0.5,at=0,adj=0)
+> mtext("N",side=2,line=3,las=1,cex=0.75) 
+> mtext("Age, years",side=1,line=2.5,las=1,cex=0.75)
+> 
+> par(op)
+> layout(matrix(1))
+> dev.off()
+null device 
+          1 
+> 
+> proc.time()
+   user  system elapsed 
+  2.168   0.106   2.299 

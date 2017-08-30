@@ -1,0 +1,2702 @@
+
+R version 3.3.3 (2017-03-06) -- "Another Canoe"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> 
+> 
+> #--------------------------------
+> # xx-coastal-LF-means-by-age.R
+> #
+> # summarize LF Ab by community
+> # and by age group
+> #--------------------------------
+> 
+> #--------------------------------
+> # preamble
+> #--------------------------------
+> rm(list=ls())
+> library(SuperLearner)
+Loading required package: nnls
+Super Learner
+Version: 2.0-22
+Package created on 2016-12-10
+
+> library(tmle)
+Welcome to the tmle package, version 1.2.0-5
+
+Use tmleNews() to see details on changes and bug fixes
+> library(tmleAb)
+Welcome to the tmleAb package
+Targeted maximum likelihood estimation for antibody measurements.
+(Version 0.3.2, release date 2017-07-21)
+
+Periodically check for the latest development version using 
+devtools::install_github('ben-arnold/tmleAb')  
+
+This software is based on work funded by the
+National Institute of Allergy and Infectious Diseases
+grant K01-AI119180
+
+
+> 
+> #--------------------------------
+> # load the gaussian mixture model
+> # results for seropositive cutoffs
+> #--------------------------------
+> load(file="~/dropbox/coastalkenya/results/raw/coastal-mixtures.RData")
+> 
+> 
+> #--------------------------------
+> # load the formatted dataset
+> #--------------------------------
+> load("~/dropbox/coastalkenya/data/final/coastal_kenya.RData")
+> d <- coastal_kenya
+> 
+> #--------------------------------
+> # identify seropositive individuals
+> #--------------------------------
+> d$pwb123 <- ifelse(d$wb123>wb123mixcut,1,0)
+> d$pbm14 <- ifelse(d$bm14>bm14mixcut,1,0)
+> d$pbm33 <- ifelse(d$bm33>bm33mixcut,1,0)
+> 
+> #--------------------------------
+> # set negative and zero values to
+> # 1 before the log transform
+> #--------------------------------
+> d["wb123"][d["wb123"]<=0] <-1
+> d["bm14"][d["bm14"]<=0] <-1
+> d["bm33"][d["bm33"]<=0] <-1
+> 
+> 
+> #--------------------------------
+> # fn to estimate prev + exact 95% cis
+> # given the very low seroprevalence
+> # in some communities, particularly
+> # for ICT
+> #--------------------------------
+> exactprev <- function(x) {
++   # x : a binary indicator of seropositive(1) vs. seronegative(0)
++   tabx <- table(x)
++   if(length(tabx)<2) {
++     if(names(tabx)=="1") {
++       tabx <- c(0,tabx)
++     } else{
++       tabx <- c(tabx,0)
++     }
++   } 
++   estx <- binom.test(x=tabx[2],n=sum(tabx))
++   res <- c(estx$parameter,estx$statistic,estx$estimate,estx$conf.int)
++   names(res) <- c("N","n","prev","min95","max95")
++   return(res)
++ }
+> 
+> d$agecat <- cut(d$age,breaks=c(0,5,10,15,20,30,40,50,100))
+> 
+> 
+> #--------------------------------
+> # Wb123 mean Ab and
+> # seroprevalence by community
+> #--------------------------------
+> set.seed(1234)
+> wb123mus <- list()
+> for(i in 1:10) {
++   wb123mus[[i]] <- sapply(levels(d$agecat),
++                            FUN = function(x) {
++                              tmleAb(Y=log10(d$wb123[d$community==i & d$agecat==x]),W=d[d$community==i & d$agecat==x,"age"],SL.library=c("SL.mean","SL.glm","SL.gam"),gamdf=2:6)[c("psi","se","lb","ub")]}
++   )
++ }
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+Loading required package: gam
+Loading required package: splines
+Loading required package: foreach
+Loaded gam 1.14
+
+ Population Mean
+   Parameter Estimate:  2.1539
+   Estimated Variance:  0.0018918
+              p-value:  <2e-16
+    95% Conf Interval: (2.0686, 2.2391) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2568
+   Estimated Variance:  0.003147
+              p-value:  <2e-16
+    95% Conf Interval: (2.1469, 2.3668) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2823
+   Estimated Variance:  0.0027775
+              p-value:  <2e-16
+    95% Conf Interval: (2.179, 2.3856) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.282
+   Estimated Variance:  0.01094
+              p-value:  <2e-16
+    95% Conf Interval: (2.077, 2.487) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2427
+   Estimated Variance:  0.0025129
+              p-value:  <2e-16
+    95% Conf Interval: (2.1444, 2.3409) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2254
+   Estimated Variance:  0.0028859
+              p-value:  <2e-16
+    95% Conf Interval: (2.1201, 2.3307) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4587
+   Estimated Variance:  0.0033594
+              p-value:  <2e-16
+    95% Conf Interval: (2.3451, 2.5723) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4482
+   Estimated Variance:  0.0039232
+              p-value:  <2e-16
+    95% Conf Interval: (2.3255, 2.571) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7053
+   Estimated Variance:  0.0090554
+              p-value:  <2e-16
+    95% Conf Interval: (1.5188, 1.8918) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7286
+   Estimated Variance:  0.0013429
+              p-value:  <2e-16
+    95% Conf Interval: (1.6568, 1.8004) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9582
+   Estimated Variance:  0.0045897
+              p-value:  <2e-16
+    95% Conf Interval: (1.8254, 2.0909) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8086
+   Estimated Variance:  0.0024748
+              p-value:  <2e-16
+    95% Conf Interval: (1.7111, 1.9061) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8625
+   Estimated Variance:  0.0046719
+              p-value:  <2e-16
+    95% Conf Interval: (1.7285, 1.9965) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1222
+   Estimated Variance:  0.0034189
+              p-value:  <2e-16
+    95% Conf Interval: (2.0076, 2.2368) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0239
+   Estimated Variance:  0.0051558
+              p-value:  <2e-16
+    95% Conf Interval: (1.8831, 2.1646) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0052
+   Estimated Variance:  0.0013445
+              p-value:  <2e-16
+    95% Conf Interval: (1.9333, 2.0771) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8719
+   Estimated Variance:  0.0027274
+              p-value:  <2e-16
+    95% Conf Interval: (1.7696, 1.9743) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8797
+   Estimated Variance:  0.0029
+              p-value:  <2e-16
+    95% Conf Interval: (1.7741, 1.9852) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0945
+   Estimated Variance:  0.0028572
+              p-value:  <2e-16
+    95% Conf Interval: (1.9898, 2.1993) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.917
+   Estimated Variance:  0.0049411
+              p-value:  <2e-16
+    95% Conf Interval: (1.7792, 2.0548) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9833
+   Estimated Variance:  0.0024369
+              p-value:  <2e-16
+    95% Conf Interval: (1.8866, 2.0801) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9206
+   Estimated Variance:  0.0024392
+              p-value:  <2e-16
+    95% Conf Interval: (1.8238, 2.0174) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0305
+   Estimated Variance:  0.0032598
+              p-value:  <2e-16
+    95% Conf Interval: (1.9186, 2.1424) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1139
+   Estimated Variance:  0.0038387
+              p-value:  <2e-16
+    95% Conf Interval: (1.9925, 2.2354) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8913
+   Estimated Variance:  0.0025523
+              p-value:  <2e-16
+    95% Conf Interval: (1.7923, 1.9904) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8841
+   Estimated Variance:  0.0026036
+              p-value:  <2e-16
+    95% Conf Interval: (1.7841, 1.9841) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9225
+   Estimated Variance:  0.0026193
+              p-value:  <2e-16
+    95% Conf Interval: (1.8222, 2.0228) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0729
+   Estimated Variance:  0.0074518
+              p-value:  <2e-16
+    95% Conf Interval: (1.9037, 2.242) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9396
+   Estimated Variance:  0.010582
+              p-value:  <2e-16
+    95% Conf Interval: (1.738, 2.1412) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8849
+   Estimated Variance:  0.0024654
+              p-value:  <2e-16
+    95% Conf Interval: (1.7876, 1.9822) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9751
+   Estimated Variance:  0.0032397
+              p-value:  <2e-16
+    95% Conf Interval: (1.8635, 2.0866) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0637
+   Estimated Variance:  0.0014049
+              p-value:  <2e-16
+    95% Conf Interval: (1.9902, 2.1371) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7299
+   Estimated Variance:  0.001511
+              p-value:  <2e-16
+    95% Conf Interval: (1.6538, 1.8061) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8329
+   Estimated Variance:  0.002408
+              p-value:  <2e-16
+    95% Conf Interval: (1.7367, 1.9291) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8538
+   Estimated Variance:  0.0017207
+              p-value:  <2e-16
+    95% Conf Interval: (1.7725, 1.9351) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9781
+   Estimated Variance:  0.0040803
+              p-value:  <2e-16
+    95% Conf Interval: (1.8529, 2.1033) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0334
+   Estimated Variance:  0.0056279
+              p-value:  <2e-16
+    95% Conf Interval: (1.8863, 2.1804) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1421
+   Estimated Variance:  0.0046988
+              p-value:  <2e-16
+    95% Conf Interval: (2.0078, 2.2765) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2494
+   Estimated Variance:  0.010578
+              p-value:  <2e-16
+    95% Conf Interval: (2.0478, 2.451) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.6622
+   Estimated Variance:  0.022918
+              p-value:  <2e-16
+    95% Conf Interval: (2.3655, 2.9589) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7806
+   Estimated Variance:  0.0029058
+              p-value:  <2e-16
+    95% Conf Interval: (1.6749, 1.8862) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8719
+   Estimated Variance:  0.0016203
+              p-value:  <2e-16
+    95% Conf Interval: (1.793, 1.9508) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8868
+   Estimated Variance:  0.0029614
+              p-value:  <2e-16
+    95% Conf Interval: (1.7801, 1.9935) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8234
+   Estimated Variance:  0.003394
+              p-value:  <2e-16
+    95% Conf Interval: (1.7092, 1.9376) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0313
+   Estimated Variance:  0.0030197
+              p-value:  <2e-16
+    95% Conf Interval: (1.9236, 2.139) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0252
+   Estimated Variance:  0.0066538
+              p-value:  <2e-16
+    95% Conf Interval: (1.8653, 2.1851) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0768
+   Estimated Variance:  0.012506
+              p-value:  <2e-16
+    95% Conf Interval: (1.8576, 2.296) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0585
+   Estimated Variance:  0.0047733
+              p-value:  <2e-16
+    95% Conf Interval: (1.923, 2.1939) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7615
+   Estimated Variance:  0.0061111
+              p-value:  <2e-16
+    95% Conf Interval: (1.6083, 1.9147) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7953
+   Estimated Variance:  0.0025303
+              p-value:  <2e-16
+    95% Conf Interval: (1.6967, 1.8939) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9617
+   Estimated Variance:  0.0028454
+              p-value:  <2e-16
+    95% Conf Interval: (1.8572, 2.0663) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.014
+   Estimated Variance:  0.0035465
+              p-value:  <2e-16
+    95% Conf Interval: (1.8973, 2.1308) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2356
+   Estimated Variance:  0.0064538
+              p-value:  <2e-16
+    95% Conf Interval: (2.0782, 2.3931) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1765
+   Estimated Variance:  0.008907
+              p-value:  <2e-16
+    95% Conf Interval: (1.9915, 2.3615) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2759
+   Estimated Variance:  0.0060421
+              p-value:  <2e-16
+    95% Conf Interval: (2.1235, 2.4283) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2021
+   Estimated Variance:  0.0039839
+              p-value:  <2e-16
+    95% Conf Interval: (2.0784, 2.3258) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8025
+   Estimated Variance:  0.0040217
+              p-value:  <2e-16
+    95% Conf Interval: (1.6782, 1.9268) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9684
+   Estimated Variance:  0.0041548
+              p-value:  <2e-16
+    95% Conf Interval: (1.8421, 2.0948) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.93
+   Estimated Variance:  0.0032038
+              p-value:  <2e-16
+    95% Conf Interval: (1.8191, 2.041) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9571
+   Estimated Variance:  0.0034907
+              p-value:  <2e-16
+    95% Conf Interval: (1.8413, 2.0729) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9767
+   Estimated Variance:  0.0010231
+              p-value:  <2e-16
+    95% Conf Interval: (1.914, 2.0394) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.96
+   Estimated Variance:  0.0082568
+              p-value:  <2e-16
+    95% Conf Interval: (1.7819, 2.1381) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0299
+   Estimated Variance:  0.016565
+              p-value:  <2e-16
+    95% Conf Interval: (1.7776, 2.2821) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0414
+   Estimated Variance:  0.0047058
+              p-value:  <2e-16
+    95% Conf Interval: (1.9069, 2.1758) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7409
+   Estimated Variance:  0.0038981
+              p-value:  <2e-16
+    95% Conf Interval: (1.6185, 1.8632) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8987
+   Estimated Variance:  0.001933
+              p-value:  <2e-16
+    95% Conf Interval: (1.8125, 1.9848) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.6526
+   Estimated Variance:  0.0046721
+              p-value:  <2e-16
+    95% Conf Interval: (1.5186, 1.7865) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9033
+   Estimated Variance:  0.0035818
+              p-value:  <2e-16
+    95% Conf Interval: (1.786, 2.0206) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1509
+   Estimated Variance:  0.0077028
+              p-value:  <2e-16
+    95% Conf Interval: (1.9788, 2.3229) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1118
+   Estimated Variance:  0.014078
+              p-value:  <2e-16
+    95% Conf Interval: (1.8793, 2.3444) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2926
+   Estimated Variance:  0.010506
+              p-value:  <2e-16
+    95% Conf Interval: (2.0917, 2.4935) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.167
+   Estimated Variance:  0.0040913
+              p-value:  <2e-16
+    95% Conf Interval: (2.0416, 2.2923) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9864
+   Estimated Variance:  0.015911
+              p-value:  <2e-16
+    95% Conf Interval: (1.7392, 2.2336) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2119
+   Estimated Variance:  0.012347
+              p-value:  <2e-16
+    95% Conf Interval: (1.9941, 2.4297) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5163
+   Estimated Variance:  0.01419
+              p-value:  <2e-16
+    95% Conf Interval: (2.2828, 2.7498) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.8699
+   Estimated Variance:  0.058829
+              p-value:  <2e-16
+    95% Conf Interval: (2.3945, 3.3453) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.6582
+   Estimated Variance:  0.022996
+              p-value:  <2e-16
+    95% Conf Interval: (2.3609, 2.9554) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4857
+   Estimated Variance:  0.009272
+              p-value:  <2e-16
+    95% Conf Interval: (2.2969, 2.6744) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.6656
+   Estimated Variance:  0.035877
+              p-value:  <2e-16
+    95% Conf Interval: (2.2943, 3.0368) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.6571
+   Estimated Variance:  0.005863
+              p-value:  <2e-16
+    95% Conf Interval: (2.507, 2.8072) 
+> 
+> pwb123mus <- list()
+> for(i in 1:10) {
++   pwb123mus[[i]] <- sapply(levels(d$agecat),
++                          FUN = function(x) {
++                            exactprev(x=d$pwb123[d$community==i & d$agecat==x])}
++   )
++ }
+> 
+> 
+> #--------------------------------
+> # Bm14 mean Ab and
+> # seroprevalence by community
+> #--------------------------------
+> set.seed(1234)
+> bm14mus <- list()
+> for(i in 1:10) {
++   bm14mus[[i]] <- sapply(levels(d$agecat),
++                           FUN = function(x) {
++                             tmleAb(Y=log10(d$bm14[d$community==i & d$agecat==x]),W=d[d$community==i & d$agecat==x,"age"],SL.library=c("SL.mean","SL.glm","SL.gam"),gamdf=2:6)[c("psi","se","lb","ub")]}
++   )
++ }
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.6975
+   Estimated Variance:  0.0014834
+              p-value:  <2e-16
+    95% Conf Interval: (1.6221, 1.773) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7814
+   Estimated Variance:  0.0020374
+              p-value:  <2e-16
+    95% Conf Interval: (1.6929, 1.8698) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7643
+   Estimated Variance:  0.0057332
+              p-value:  <2e-16
+    95% Conf Interval: (1.6159, 1.9127) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0292
+   Estimated Variance:  0.0094301
+              p-value:  <2e-16
+    95% Conf Interval: (1.8389, 2.2196) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0047
+   Estimated Variance:  0.0036486
+              p-value:  <2e-16
+    95% Conf Interval: (1.8863, 2.1231) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0117
+   Estimated Variance:  0.011462
+              p-value:  <2e-16
+    95% Conf Interval: (1.8019, 2.2215) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1973
+   Estimated Variance:  0.00779
+              p-value:  <2e-16
+    95% Conf Interval: (2.0243, 2.3703) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3468
+   Estimated Variance:  0.008496
+              p-value:  <2e-16
+    95% Conf Interval: (2.1662, 2.5275) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.5782
+   Estimated Variance:  0.007909
+              p-value:  <2e-16
+    95% Conf Interval: (1.4039, 1.7525) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.6526
+   Estimated Variance:  0.0091706
+              p-value:  <2e-16
+    95% Conf Interval: (1.4649, 1.8403) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.6805
+   Estimated Variance:  0.0077287
+              p-value:  <2e-16
+    95% Conf Interval: (1.5082, 1.8528) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.6078
+   Estimated Variance:  0.0075113
+              p-value:  <2e-16
+    95% Conf Interval: (1.4379, 1.7777) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.79
+   Estimated Variance:  0.011896
+              p-value:  <2e-16
+    95% Conf Interval: (1.5762, 2.0037) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9209
+   Estimated Variance:  0.0080722
+              p-value:  <2e-16
+    95% Conf Interval: (1.7449, 2.097) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8557
+   Estimated Variance:  0.0050153
+              p-value:  <2e-16
+    95% Conf Interval: (1.7169, 1.9945) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0593
+   Estimated Variance:  0.0066868
+              p-value:  <2e-16
+    95% Conf Interval: (1.8991, 2.2196) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.4901
+   Estimated Variance:  0.0035267
+              p-value:  <2e-16
+    95% Conf Interval: (1.3737, 1.6065) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.4067
+   Estimated Variance:  0.0042117
+              p-value:  <2e-16
+    95% Conf Interval: (1.2795, 1.5339) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.542
+   Estimated Variance:  0.003642
+              p-value:  <2e-16
+    95% Conf Interval: (1.4237, 1.6603) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.511
+   Estimated Variance:  0.010063
+              p-value:  <2e-16
+    95% Conf Interval: (1.3143, 1.7076) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7484
+   Estimated Variance:  0.0086388
+              p-value:  <2e-16
+    95% Conf Interval: (1.5663, 1.9306) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9749
+   Estimated Variance:  0.013398
+              p-value:  <2e-16
+    95% Conf Interval: (1.748, 2.2018) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0035
+   Estimated Variance:  0.0088751
+              p-value:  <2e-16
+    95% Conf Interval: (1.8189, 2.1882) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1159
+   Estimated Variance:  0.0095857
+              p-value:  <2e-16
+    95% Conf Interval: (1.924, 2.3078) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.4699
+   Estimated Variance:  0.0029214
+              p-value:  <2e-16
+    95% Conf Interval: (1.364, 1.5759) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.4611
+   Estimated Variance:  0.005137
+              p-value:  <2e-16
+    95% Conf Interval: (1.3206, 1.6016) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.4938
+   Estimated Variance:  0.0026988
+              p-value:  <2e-16
+    95% Conf Interval: (1.3919, 1.5956) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7489
+   Estimated Variance:  0.018967
+              p-value:  <2e-16
+    95% Conf Interval: (1.479, 2.0189) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7339
+   Estimated Variance:  0.017284
+              p-value:  <2e-16
+    95% Conf Interval: (1.4762, 1.9916) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7446
+   Estimated Variance:  0.0083895
+              p-value:  <2e-16
+    95% Conf Interval: (1.5651, 1.9241) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9052
+   Estimated Variance:  0.012737
+              p-value:  <2e-16
+    95% Conf Interval: (1.684, 2.1264) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9802
+   Estimated Variance:  0.0058229
+              p-value:  <2e-16
+    95% Conf Interval: (1.8306, 2.1298) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.409
+   Estimated Variance:  0.0014471
+              p-value:  <2e-16
+    95% Conf Interval: (1.3345, 1.4836) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.4152
+   Estimated Variance:  0.0019617
+              p-value:  <2e-16
+    95% Conf Interval: (1.3284, 1.502) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.4344
+   Estimated Variance:  0.0050433
+              p-value:  <2e-16
+    95% Conf Interval: (1.2952, 1.5736) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.739
+   Estimated Variance:  0.011909
+              p-value:  <2e-16
+    95% Conf Interval: (1.5251, 1.9529) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7969
+   Estimated Variance:  0.0081403
+              p-value:  <2e-16
+    95% Conf Interval: (1.62, 1.9737) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0532
+   Estimated Variance:  0.012195
+              p-value:  <2e-16
+    95% Conf Interval: (1.8368, 2.2697) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.997
+   Estimated Variance:  0.018804
+              p-value:  <2e-16
+    95% Conf Interval: (1.7282, 2.2658) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.9162
+   Estimated Variance:  0.045917
+              p-value:  <2e-16
+    95% Conf Interval: (2.4963, 3.3362) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.3083
+   Estimated Variance:  0.0027236
+              p-value:  <2e-16
+    95% Conf Interval: (1.206, 1.4106) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.4044
+   Estimated Variance:  0.0024262
+              p-value:  <2e-16
+    95% Conf Interval: (1.3079, 1.5009) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.5408
+   Estimated Variance:  0.0055391
+              p-value:  <2e-16
+    95% Conf Interval: (1.395, 1.6867) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.5923
+   Estimated Variance:  0.015596
+              p-value:  <2e-16
+    95% Conf Interval: (1.3475, 1.837) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8913
+   Estimated Variance:  0.018715
+              p-value:  <2e-16
+    95% Conf Interval: (1.6232, 2.1595) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8134
+   Estimated Variance:  0.004564
+              p-value:  <2e-16
+    95% Conf Interval: (1.681, 1.9458) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8626
+   Estimated Variance:  0.011563
+              p-value:  <2e-16
+    95% Conf Interval: (1.6518, 2.0734) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9642
+   Estimated Variance:  0.005993
+              p-value:  <2e-16
+    95% Conf Interval: (1.8124, 2.1159) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.5301
+   Estimated Variance:  0.0026675
+              p-value:  <2e-16
+    95% Conf Interval: (1.4289, 1.6313) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.5497
+   Estimated Variance:  0.0021977
+              p-value:  <2e-16
+    95% Conf Interval: (1.4578, 1.6415) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.658
+   Estimated Variance:  0.0042292
+              p-value:  <2e-16
+    95% Conf Interval: (1.5306, 1.7855) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7866
+   Estimated Variance:  0.0096073
+              p-value:  <2e-16
+    95% Conf Interval: (1.5945, 1.9787) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.184
+   Estimated Variance:  0.030323
+              p-value:  <2e-16
+    95% Conf Interval: (1.8427, 2.5253) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0794
+   Estimated Variance:  0.015564
+              p-value:  <2e-16
+    95% Conf Interval: (1.8349, 2.3239) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5673
+   Estimated Variance:  0.025861
+              p-value:  <2e-16
+    95% Conf Interval: (2.2521, 2.8824) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2437
+   Estimated Variance:  0.0082818
+              p-value:  <2e-16
+    95% Conf Interval: (2.0653, 2.4221) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.661
+   Estimated Variance:  0.0034335
+              p-value:  <2e-16
+    95% Conf Interval: (1.5462, 1.7759) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.5827
+   Estimated Variance:  0.0017681
+              p-value:  <2e-16
+    95% Conf Interval: (1.5003, 1.6651) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.6161
+   Estimated Variance:  0.0025571
+              p-value:  <2e-16
+    95% Conf Interval: (1.517, 1.7152) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7258
+   Estimated Variance:  0.0072047
+              p-value:  <2e-16
+    95% Conf Interval: (1.5594, 1.8921) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9044
+   Estimated Variance:  0.0060985
+              p-value:  <2e-16
+    95% Conf Interval: (1.7513, 2.0575) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.0148
+   Estimated Variance:  0.020836
+              p-value:  <2e-16
+    95% Conf Interval: (1.7318, 2.2977) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3121
+   Estimated Variance:  0.07945
+              p-value:  2.3474e-16
+    95% Conf Interval: (1.7597, 2.8646) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1276
+   Estimated Variance:  0.019973
+              p-value:  <2e-16
+    95% Conf Interval: (1.8506, 2.4046) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.5661
+   Estimated Variance:  0.0019885
+              p-value:  <2e-16
+    95% Conf Interval: (1.4787, 1.6535) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.571
+   Estimated Variance:  0.0024883
+              p-value:  <2e-16
+    95% Conf Interval: (1.4732, 1.6687) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.5491
+   Estimated Variance:  0.0051315
+              p-value:  <2e-16
+    95% Conf Interval: (1.4087, 1.6895) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.8001
+   Estimated Variance:  0.015539
+              p-value:  <2e-16
+    95% Conf Interval: (1.5558, 2.0444) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.9609
+   Estimated Variance:  0.011029
+              p-value:  <2e-16
+    95% Conf Interval: (1.755, 2.1667) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.7506
+   Estimated Variance:  0.012405
+              p-value:  <2e-16
+    95% Conf Interval: (1.5323, 1.9689) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1148
+   Estimated Variance:  0.011191
+              p-value:  <2e-16
+    95% Conf Interval: (1.9074, 2.3221) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2924
+   Estimated Variance:  0.0083751
+              p-value:  <2e-16
+    95% Conf Interval: (2.113, 2.4717) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  1.5646
+   Estimated Variance:  0.013756
+              p-value:  <2e-16
+    95% Conf Interval: (1.3348, 1.7945) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1112
+   Estimated Variance:  0.030377
+              p-value:  <2e-16
+    95% Conf Interval: (1.7696, 2.4528) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.7064
+   Estimated Variance:  0.030509
+              p-value:  <2e-16
+    95% Conf Interval: (2.364, 3.0487) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.8325
+   Estimated Variance:  0.079841
+              p-value:  <2e-16
+    95% Conf Interval: (2.2787, 3.3864) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.8353
+   Estimated Variance:  0.034398
+              p-value:  <2e-16
+    95% Conf Interval: (2.4718, 3.1988) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5157
+   Estimated Variance:  0.015018
+              p-value:  <2e-16
+    95% Conf Interval: (2.2755, 2.7559) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.7581
+   Estimated Variance:  0.044952
+              p-value:  <2e-16
+    95% Conf Interval: (2.3425, 3.1736) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  3.0645
+   Estimated Variance:  0.009743
+              p-value:  <2e-16
+    95% Conf Interval: (2.871, 3.258) 
+> 
+> pbm14mus <- list()
+> for(i in 1:10) {
++   pbm14mus[[i]] <- sapply(levels(d$agecat),
++                            FUN = function(x) {
++                              exactprev(x=d$pbm14[d$community==i & d$agecat==x])}
++   )
++ }
+> 
+> 
+> 
+> #--------------------------------
+> # Bm33 mean Ab and
+> # seroprevalence by community
+> #--------------------------------
+> set.seed(1234)
+> bm33mus <- list()
+> for(i in 1:10) {
++   bm33mus[[i]] <- sapply(levels(d$agecat),
++                          FUN = function(x) {
++                            tmleAb(Y=log10(d$bm33[d$community==i & d$agecat==x]),W=d[d$community==i & d$agecat==x,"age"],SL.library=c("SL.mean","SL.glm","SL.gam"),gamdf=2:6)[c("psi","se","lb","ub")]}
++   )
++ }
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.7018
+   Estimated Variance:  0.0028504
+              p-value:  <2e-16
+    95% Conf Interval: (2.5972, 2.8065) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.7524
+   Estimated Variance:  0.0014317
+              p-value:  <2e-16
+    95% Conf Interval: (2.6783, 2.8266) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.8229
+   Estimated Variance:  0.0076854
+              p-value:  <2e-16
+    95% Conf Interval: (2.6511, 2.9948) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.8725
+   Estimated Variance:  0.0122
+              p-value:  <2e-16
+    95% Conf Interval: (2.656, 3.0889) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.6141
+   Estimated Variance:  0.001138
+              p-value:  <2e-16
+    95% Conf Interval: (2.548, 2.6802) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.7239
+   Estimated Variance:  0.0029975
+              p-value:  <2e-16
+    95% Conf Interval: (2.6166, 2.8312) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.7723
+   Estimated Variance:  0.0043196
+              p-value:  <2e-16
+    95% Conf Interval: (2.6434, 2.9011) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.7783
+   Estimated Variance:  0.0015046
+              p-value:  <2e-16
+    95% Conf Interval: (2.7022, 2.8543) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1753
+   Estimated Variance:  0.0033521
+              p-value:  <2e-16
+    95% Conf Interval: (2.0618, 2.2888) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3096
+   Estimated Variance:  0.0060124
+              p-value:  <2e-16
+    95% Conf Interval: (2.1576, 2.4615) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3584
+   Estimated Variance:  0.0029233
+              p-value:  <2e-16
+    95% Conf Interval: (2.2524, 2.4643) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3773
+   Estimated Variance:  0.011061
+              p-value:  <2e-16
+    95% Conf Interval: (2.1712, 2.5834) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3857
+   Estimated Variance:  0.0048041
+              p-value:  <2e-16
+    95% Conf Interval: (2.2498, 2.5215) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.566
+   Estimated Variance:  0.0075665
+              p-value:  <2e-16
+    95% Conf Interval: (2.3955, 2.7365) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4504
+   Estimated Variance:  0.0035633
+              p-value:  <2e-16
+    95% Conf Interval: (2.3334, 2.5674) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4661
+   Estimated Variance:  0.0019299
+              p-value:  <2e-16
+    95% Conf Interval: (2.38, 2.5522) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2925
+   Estimated Variance:  0.0023638
+              p-value:  <2e-16
+    95% Conf Interval: (2.1972, 2.3878) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3278
+   Estimated Variance:  0.0015303
+              p-value:  <2e-16
+    95% Conf Interval: (2.2511, 2.4045) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4951
+   Estimated Variance:  0.0082891
+              p-value:  <2e-16
+    95% Conf Interval: (2.3167, 2.6736) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3695
+   Estimated Variance:  0.0032702
+              p-value:  <2e-16
+    95% Conf Interval: (2.2574, 2.4816) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5036
+   Estimated Variance:  0.004658
+              p-value:  <2e-16
+    95% Conf Interval: (2.3699, 2.6374) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4036
+   Estimated Variance:  0.0018497
+              p-value:  <2e-16
+    95% Conf Interval: (2.3193, 2.4879) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5665
+   Estimated Variance:  0.007099
+              p-value:  <2e-16
+    95% Conf Interval: (2.4013, 2.7316) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4326
+   Estimated Variance:  0.0015642
+              p-value:  <2e-16
+    95% Conf Interval: (2.3551, 2.5101) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1344
+   Estimated Variance:  0.0025201
+              p-value:  <2e-16
+    95% Conf Interval: (2.036, 2.2328) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2829
+   Estimated Variance:  0.0027113
+              p-value:  <2e-16
+    95% Conf Interval: (2.1809, 2.385) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3457
+   Estimated Variance:  0.0014801
+              p-value:  <2e-16
+    95% Conf Interval: (2.2703, 2.4211) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3832
+   Estimated Variance:  0.0046032
+              p-value:  <2e-16
+    95% Conf Interval: (2.2502, 2.5162) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3752
+   Estimated Variance:  0.0098393
+              p-value:  <2e-16
+    95% Conf Interval: (2.1808, 2.5696) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.29
+   Estimated Variance:  0.0055206
+              p-value:  <2e-16
+    95% Conf Interval: (2.1443, 2.4356) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2642
+   Estimated Variance:  0.0022695
+              p-value:  <2e-16
+    95% Conf Interval: (2.1708, 2.3576) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4117
+   Estimated Variance:  0.0032576
+              p-value:  <2e-16
+    95% Conf Interval: (2.2998, 2.5235) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2411
+   Estimated Variance:  0.0022853
+              p-value:  <2e-16
+    95% Conf Interval: (2.1474, 2.3348) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3351
+   Estimated Variance:  0.0021807
+              p-value:  <2e-16
+    95% Conf Interval: (2.2436, 2.4266) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3706
+   Estimated Variance:  0.002694
+              p-value:  <2e-16
+    95% Conf Interval: (2.2689, 2.4724) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4541
+   Estimated Variance:  0.0080166
+              p-value:  <2e-16
+    95% Conf Interval: (2.2786, 2.6296) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3726
+   Estimated Variance:  0.0038813
+              p-value:  <2e-16
+    95% Conf Interval: (2.2504, 2.4947) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3801
+   Estimated Variance:  0.0028474
+              p-value:  <2e-16
+    95% Conf Interval: (2.2755, 2.4846) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4231
+   Estimated Variance:  0.0068744
+              p-value:  <2e-16
+    95% Conf Interval: (2.2606, 2.5856) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.6978
+   Estimated Variance:  0.0058732
+              p-value:  <2e-16
+    95% Conf Interval: (2.5476, 2.848) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1642
+   Estimated Variance:  0.0041176
+              p-value:  <2e-16
+    95% Conf Interval: (2.0384, 2.2899) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2334
+   Estimated Variance:  0.0014276
+              p-value:  <2e-16
+    95% Conf Interval: (2.1593, 2.3074) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2483
+   Estimated Variance:  0.0024303
+              p-value:  <2e-16
+    95% Conf Interval: (2.1517, 2.3449) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2393
+   Estimated Variance:  0.0039983
+              p-value:  <2e-16
+    95% Conf Interval: (2.1154, 2.3633) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3094
+   Estimated Variance:  0.0031318
+              p-value:  <2e-16
+    95% Conf Interval: (2.1997, 2.4191) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5265
+   Estimated Variance:  0.012679
+              p-value:  <2e-16
+    95% Conf Interval: (2.3058, 2.7472) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2737
+   Estimated Variance:  0.0018255
+              p-value:  <2e-16
+    95% Conf Interval: (2.19, 2.3575) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3897
+   Estimated Variance:  0.0028208
+              p-value:  <2e-16
+    95% Conf Interval: (2.2856, 2.4938) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4691
+   Estimated Variance:  0.0045846
+              p-value:  <2e-16
+    95% Conf Interval: (2.3364, 2.6019) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.442
+   Estimated Variance:  0.0017093
+              p-value:  <2e-16
+    95% Conf Interval: (2.361, 2.5231) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5135
+   Estimated Variance:  0.0019444
+              p-value:  <2e-16
+    95% Conf Interval: (2.4271, 2.5999) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5274
+   Estimated Variance:  0.005142
+              p-value:  <2e-16
+    95% Conf Interval: (2.3869, 2.6679) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.676
+   Estimated Variance:  0.0068174
+              p-value:  <2e-16
+    95% Conf Interval: (2.5142, 2.8378) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.6035
+   Estimated Variance:  0.0058799
+              p-value:  <2e-16
+    95% Conf Interval: (2.4532, 2.7538) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.483
+   Estimated Variance:  0.0024873
+              p-value:  <2e-16
+    95% Conf Interval: (2.3852, 2.5807) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5224
+   Estimated Variance:  0.0013457
+              p-value:  <2e-16
+    95% Conf Interval: (2.4505, 2.5943) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.1551
+   Estimated Variance:  0.0019816
+              p-value:  <2e-16
+    95% Conf Interval: (2.0678, 2.2423) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2479
+   Estimated Variance:  0.0020949
+              p-value:  <2e-16
+    95% Conf Interval: (2.1582, 2.3376) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4035
+   Estimated Variance:  0.0039649
+              p-value:  <2e-16
+    95% Conf Interval: (2.2801, 2.5269) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4625
+   Estimated Variance:  0.013587
+              p-value:  <2e-16
+    95% Conf Interval: (2.2341, 2.691) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3954
+   Estimated Variance:  0.0021474
+              p-value:  <2e-16
+    95% Conf Interval: (2.3045, 2.4862) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.382
+   Estimated Variance:  0.0039662
+              p-value:  <2e-16
+    95% Conf Interval: (2.2585, 2.5054) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.458
+   Estimated Variance:  0.023079
+              p-value:  <2e-16
+    95% Conf Interval: (2.1602, 2.7557) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4117
+   Estimated Variance:  0.0081794
+              p-value:  <2e-16
+    95% Conf Interval: (2.2345, 2.589) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.2775
+   Estimated Variance:  0.00074229
+              p-value:  <2e-16
+    95% Conf Interval: (2.2241, 2.3309) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.3879
+   Estimated Variance:  0.0020422
+              p-value:  <2e-16
+    95% Conf Interval: (2.2993, 2.4765) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4666
+   Estimated Variance:  0.0075825
+              p-value:  <2e-16
+    95% Conf Interval: (2.296, 2.6373) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4895
+   Estimated Variance:  0.0032289
+              p-value:  <2e-16
+    95% Conf Interval: (2.3781, 2.6008) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5682
+   Estimated Variance:  0.0045061
+              p-value:  <2e-16
+    95% Conf Interval: (2.4367, 2.6998) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4403
+   Estimated Variance:  0.0036399
+              p-value:  <2e-16
+    95% Conf Interval: (2.3221, 2.5586) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5321
+   Estimated Variance:  0.0034172
+              p-value:  <2e-16
+    95% Conf Interval: (2.4175, 2.6467) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.5075
+   Estimated Variance:  0.0024335
+              p-value:  <2e-16
+    95% Conf Interval: (2.4108, 2.6042) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.4763
+   Estimated Variance:  0.0085942
+              p-value:  <2e-16
+    95% Conf Interval: (2.2946, 2.658) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.8499
+   Estimated Variance:  0.011814
+              p-value:  <2e-16
+    95% Conf Interval: (2.6369, 3.0629) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  3.0709
+   Estimated Variance:  0.0087993
+              p-value:  <2e-16
+    95% Conf Interval: (2.887, 3.2547) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  3.287
+   Estimated Variance:  0.024725
+              p-value:  <2e-16
+    95% Conf Interval: (2.9788, 3.5952) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  3.0618
+   Estimated Variance:  0.011297
+              p-value:  <2e-16
+    95% Conf Interval: (2.8535, 3.2701) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.8513
+   Estimated Variance:  0.0070876
+              p-value:  <2e-16
+    95% Conf Interval: (2.6863, 3.0163) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  2.9079
+   Estimated Variance:  0.022485
+              p-value:  <2e-16
+    95% Conf Interval: (2.614, 3.2018) 
+
+-----------------------------------------
+The design matrix you supplied is not a matrix or a data.frame
+Assuming that it is a single variable
+-----------------------------------------
+ Population Mean
+   Parameter Estimate:  3.046
+   Estimated Variance:  0.0037692
+              p-value:  <2e-16
+    95% Conf Interval: (2.9256, 3.1663) 
+> 
+> pbm33mus <- list()
+> for(i in 1:10) {
++   pbm33mus[[i]] <- sapply(levels(d$agecat),
++                           FUN = function(x) {
++                             exactprev(x=d$pbm33[d$community==i & d$agecat==x])}
++   )
++ }
+> 
+> 
+> 
+> #--------------------------------
+> # ICT prevalence by community
+> #--------------------------------
+> ictmus <- list()
+> for(i in 1:10) {
++   ictmus[[i]] <- sapply(levels(d$agecat),
++                           FUN = function(x) {
++                             exactprev(x=d$ict[d$community==i & d$agecat==x])}
++                         )
++ }
+> 
+> 
+> #--------------------------------
+> # pull out means, lb and ub
+> # from the TMLE fitted objects
+> #--------------------------------
+> 
+> # Wb123
+> wb123_psi <- matrix(NA,nrow=10,ncol=8)
+> wb123_lb <- wb123_psi
+> wb123_ub <- wb123_psi
+> for(i in 1:10) {
++   wb123_psi[i,] <- mapply(function(x1,x2) wb123mus[[x1]][,x2]$psi,x1=i,x2=1:8)
++   wb123_lb[i,] <- mapply(function(x1,x2) wb123mus[[x1]][,x2]$lb,x1=i,x2=1:8)
++   wb123_ub[i,] <- mapply(function(x1,x2) wb123mus[[x1]][,x2]$ub,x1=i,x2=1:8)
++ }
+> rownames(wb123_psi) <- rownames(wb123_lb) <- rownames(wb123_ub) <- 1:10
+> colnames(wb123_psi) <- colnames(wb123_lb) <- colnames(wb123_ub) <- levels(d$agecat)
+> 
+> 
+> # Bm14
+> bm14_psi <- matrix(NA,nrow=10,ncol=8)
+> bm14_lb <- bm14_psi
+> bm14_ub <- bm14_psi
+> for(i in 1:10) {
++   bm14_psi[i,] <- mapply(function(x1,x2) bm14mus[[x1]][,x2]$psi,x1=i,x2=1:8)
++   bm14_lb[i,] <- mapply(function(x1,x2) bm14mus[[x1]][,x2]$lb,x1=i,x2=1:8)
++   bm14_ub[i,] <- mapply(function(x1,x2) bm14mus[[x1]][,x2]$ub,x1=i,x2=1:8)
++ }
+> rownames(bm14_psi) <- rownames(bm14_lb) <- rownames(bm14_ub) <- 1:10
+> colnames(bm14_psi) <- colnames(bm14_lb) <- colnames(bm14_ub) <- levels(d$agecat)
+> 
+> # Bm33
+> bm33_psi <- matrix(NA,nrow=10,ncol=8)
+> bm33_lb <- bm33_psi
+> bm33_ub <- bm33_psi
+> for(i in 1:10) {
++   bm33_psi[i,] <- mapply(function(x1,x2) bm33mus[[x1]][,x2]$psi,x1=i,x2=1:8)
++   bm33_lb[i,] <- mapply(function(x1,x2) bm33mus[[x1]][,x2]$lb,x1=i,x2=1:8)
++   bm33_ub[i,] <- mapply(function(x1,x2) bm33mus[[x1]][,x2]$ub,x1=i,x2=1:8)
++ }
+> rownames(bm33_psi) <- rownames(bm33_lb) <- rownames(bm33_ub) <- 1:10
+> colnames(bm33_psi) <- colnames(bm33_lb) <- colnames(bm33_ub) <- levels(d$agecat)
+> 
+> #--------------------------------
+> # pull out prev, lb and ub
+> # from the exactprev objects
+> #--------------------------------
+> 
+> # Wb123
+> pwb123_psi <- matrix(NA,nrow=10,ncol=8)
+> pwb123_lb <- wb123_psi
+> pwb123_ub <- wb123_psi
+> for(i in 1:10) {
++   pwb123_psi[i,] <- mapply(function(x1,x2) pwb123mus[[x1]][3,x2],x1=i,x2=1:8)
++   pwb123_lb[i,] <- mapply(function(x1,x2) pwb123mus[[x1]][4,x2],x1=i,x2=1:8)
++   pwb123_ub[i,] <- mapply(function(x1,x2) pwb123mus[[x1]][5,x2],x1=i,x2=1:8)
++ }
+> rownames(pwb123_psi) <- rownames(pwb123_lb) <- rownames(pwb123_ub) <- 1:10
+> colnames(pwb123_psi) <- colnames(pwb123_lb) <- colnames(pwb123_ub) <- levels(d$agecat)
+> 
+> # Bm14
+> pbm14_psi <- matrix(NA,nrow=10,ncol=8)
+> pbm14_lb <- wb123_psi
+> pbm14_ub <- wb123_psi
+> for(i in 1:10) {
++   pbm14_psi[i,] <- mapply(function(x1,x2) pbm14mus[[x1]][3,x2],x1=i,x2=1:8)
++   pbm14_lb[i,] <- mapply(function(x1,x2) pbm14mus[[x1]][4,x2],x1=i,x2=1:8)
++   pbm14_ub[i,] <- mapply(function(x1,x2) pbm14mus[[x1]][5,x2],x1=i,x2=1:8)
++ }
+> rownames(pbm14_psi) <- rownames(pbm14_lb) <- rownames(pbm14_ub) <- 1:10
+> colnames(pbm14_psi) <- colnames(pbm14_lb) <- colnames(pbm14_ub) <- levels(d$agecat)
+> 
+> # Bm33
+> pbm33_psi <- matrix(NA,nrow=10,ncol=8)
+> pbm33_lb <- wb123_psi
+> pbm33_ub <- wb123_psi
+> for(i in 1:10) {
++   pbm33_psi[i,] <- mapply(function(x1,x2) pbm33mus[[x1]][3,x2],x1=i,x2=1:8)
++   pbm33_lb[i,] <- mapply(function(x1,x2) pbm33mus[[x1]][4,x2],x1=i,x2=1:8)
++   pbm33_ub[i,] <- mapply(function(x1,x2) pbm33mus[[x1]][5,x2],x1=i,x2=1:8)
++ }
+> rownames(pbm33_psi) <- rownames(pbm33_lb) <- rownames(pbm33_ub) <- 1:10
+> colnames(pbm33_psi) <- colnames(pbm33_lb) <- colnames(pbm33_ub) <- levels(d$agecat)
+> 
+> # ICT
+> ict_psi <- matrix(NA,nrow=10,ncol=8)
+> ict_lb <- ict_psi
+> ict_ub <- ict_psi
+> for(i in 1:10) {
++   ict_psi[i,] <- mapply(function(x1,x2) ictmus[[x1]][3,x2],x1=i,x2=1:8)
++   ict_lb[i,]  <- mapply(function(x1,x2) ictmus[[x1]][4,x2],x1=i,x2=1:8)
++   ict_ub[i,]  <- mapply(function(x1,x2) ictmus[[x1]][5,x2],x1=i,x2=1:8)
++ }
+> rownames(ict_psi) <- rownames(ict_lb) <- rownames(ict_ub)  <- 1:10
+> colnames(ict_psi) <- colnames(ict_lb) <- colnames(ict_ub) <- levels(d$agecat)
+> 
+> #--------------------------------
+> # save results
+> #--------------------------------
+> save.image(file="~/dropbox/coastalkenya/results/raw/coastal-LF-by-age.RData")
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+165.523   2.468 175.214 
