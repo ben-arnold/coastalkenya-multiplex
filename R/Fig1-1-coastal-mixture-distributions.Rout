@@ -1,0 +1,239 @@
+
+R version 3.3.3 (2017-03-06) -- "Another Canoe"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> 
+> 
+> #--------------------------------
+> # coastal-mixture-distributions.R
+> #
+> # estimate seropositivity cutoffs
+> # from continuous Ab levels using
+> # gaussian mixture models
+> #
+> # select the number of groups
+> # data-adaptively using AIC loss
+> # for distributions that are
+> # really wide -- malaria
+> #--------------------------------
+> 
+> #--------------------------------
+> # preamble
+> #--------------------------------
+> rm(list=ls())
+> library(mixtools)
+mixtools package, version 1.1.0, Released 2017-03-10
+This package is based upon work supported by the National Science Foundation under Grant No. SES-0518772.
+
+> 
+> 
+> #--------------------------------
+> # fn to determin optimal k
+> # using AIC 
+> # (not used)
+> #--------------------------------
+> 
+> optmix <- function(x,lambda,k) {
++   # estimate mixtures for values of k
++   nk <- length(k)
++   estk <- list()
++   for(i in 1:nk) {
++     cat("\n k = ",k[i],"\n")
++     estk[[i]] <- normalmixEM(x=x[!is.na(x)],lambda=lambda,k=k[i])
++     summary(estk[[i]])
++   }
++   
++   # compute AIC
++   LLs <-  sapply(estk, function(y) y$loglik)
++   AICs <- sapply(estk, function(y) {
++     return(2*(length(c(y$lambda,y$mu,y$sigma))-1) - 2*y$loglik)
++     })
++   cat("\nLogLik and AICs for each value k:\n")
++   print(cbind(k,LLs,AICs))
++   
++   # return optimal fit
++   optfit <- estk[which(AICs==min(AICs))][[1]]
++   cat("\nOptimal k in terms of AIC:",length(optfit$mu),"\n\n")
++   return(optfit)
++ }
+> 
+> 
+> #--------------------------------
+> # load the formatted dataset
+> #--------------------------------
+> load("~/dropbox/coastalkenya/data/final/coastal_kenya.RData")
+> d <- coastal_kenya
+> 
+> #--------------------------------
+> # Malaria
+> #--------------------------------
+> set.seed(1234)
+> cspmix <- normalmixEM(d$csp,lambda=0.5,k=2)
+number of iterations= 60 
+>   summary(cspmix)
+summary of normalmixEM object:
+           comp 1      comp 2
+lambda   0.592481    0.407519
+mu     111.379590 7531.132473
+sigma   85.342267 8842.349145
+loglik at estimate:  -23786.36 
+> pfmix <- normalmixEM(d$msp1pf,lambda=0.5,k=2)
+number of iterations= 65 
+>   summary(pfmix)
+summary of normalmixEM object:
+           comp 1      comp 2
+lambda   0.409331 5.90669e-01
+mu      93.891179 1.56081e+04
+sigma  107.312095 1.21278e+04
+loglik at estimate:  -27025.62 
+> pmmix <- normalmixEM(d$msp1pm,lambda=0.5,k=2)
+number of iterations= 43 
+>   summary(pmmix)
+summary of normalmixEM object:
+          comp 1      comp 2
+lambda  0.732929    0.267071
+mu     52.973667 3871.873151
+sigma  47.709706 6315.237518
+loglik at estimate:  -20226.21 
+> 
+> cspmixcut <- (cspmix$mu+3*cspmix$sigma)[1]
+>   cspmixcut
+[1] 367.4064
+> pfmixcut <- (pfmix$mu+3*pfmix$sigma)[1]
+>   pfmixcut
+[1] 415.8275
+> pmmixcut <- (pmmix$mu+3*pmmix$sigma)[1]
+>   pmmixcut
+[1] 196.1028
+> 
+> #--------------------------------
+> # LF
+> #--------------------------------
+> 
+> set.seed(1234)
+> wb123mix <- normalmixEM(d$wb123,lambda=0.5,k=2)
+number of iterations= 26 
+>   summary(wb123mix)
+summary of normalmixEM object:
+           comp 1      comp 2
+lambda   0.908952 9.10479e-02
+mu     112.772893 3.69608e+03
+sigma   84.286057 7.47301e+03
+loglik at estimate:  -18550.11 
+> bm14mix <- normalmixEM(d$bm14,lambda=0.5,k=2)
+number of iterations= 40 
+>   summary(bm14mix)
+summary of normalmixEM object:
+          comp 1      comp 2
+lambda  0.839078    0.160922
+mu     58.298445 4428.792731
+sigma  51.919415 7986.503866
+loglik at estimate:  -18691.85 
+> bm33mix <- normalmixEM(d$bm33,lambda=0.5,k=2)
+number of iterations= 34 
+>   summary(bm33mix)
+summary of normalmixEM object:
+           comp 1      comp 2
+lambda   0.869315    0.130685
+mu     270.050473 3909.320773
+sigma  173.573435 5551.646472
+loglik at estimate:  -20874.04 
+>   
+> wb123mixcut <- (wb123mix$mu+3*wb123mix$sigma)[1]
+>   wb123mixcut
+[1] 365.6311
+> bm14mixcut <- (bm14mix$mu+3*bm14mix$sigma)[1]
+>   bm14mixcut
+[1] 214.0567
+> bm33mixcut <- (bm33mix$mu+3*bm33mix$sigma)[1]
+>   bm33mixcut
+[1] 790.7708
+> 
+> #--------------------------------
+> # Schisto
+> #--------------------------------
+>   
+> set.seed(1234)
+> seamix  <- normalmixEM(d$sea,lambda=0.5,k=2)
+number of iterations= 40 
+>   summary(seamix)
+summary of normalmixEM object:
+           comp 1      comp 2
+lambda   0.762857    0.237143
+mu     161.896130 7041.715950
+sigma  104.613547 9324.246031
+loglik at estimate:  -21668.51 
+> sm25mix <- normalmixEM(d$sm25,lambda=0.5,k=2)
+number of iterations= 27 
+>   summary(sm25mix)
+summary of normalmixEM object:
+         comp 1      comp 2
+lambda 0.894538    0.105462
+mu     6.910876 1119.583209
+sigma  8.327037 3478.709764
+loglik at estimate:  -12750.76 
+>   
+> seamixcut <- (seamix$mu+3*seamix$sigma)[1]
+>   seamixcut
+[1] 475.7368
+> sm25mixcut <- (sm25mix$mu+3*sm25mix$sigma)[1]
+>   sm25mixcut
+[1] 31.89199
+>   
+> #--------------------------------
+> # Strongy + Ascaris
+> #--------------------------------
+> set.seed(1234)
+> niemix  <- normalmixEM(d$nie,lambda=0.5,k=2)
+number of iterations= 27 
+>   summary(niemix)
+summary of normalmixEM object:
+          comp 1      comp 2
+lambda   0.87421     0.12579
+mu     197.37596  9220.43995
+sigma  149.24234 11364.17127
+loglik at estimate:  -20753.03 
+> ascarismix <- normalmixEM(d$ascaris,lambda=0.5,k=2)
+number of iterations= 60 
+>   summary(ascarismix)
+summary of normalmixEM object:
+           comp 1      comp 2
+lambda   0.705725    0.294275
+mu     221.254959 2695.345343
+sigma  186.189190 3122.250853
+loglik at estimate:  -22563.95 
+>   
+> niemixcut <- (niemix$mu+3*niemix$sigma)[1]
+>   niemixcut
+[1] 645.103
+> ascarismixcut <- (ascarismix$mu+3*ascarismix$sigma)[1]
+>   ascarismixcut
+[1] 779.8225
+>   
+> #--------------------------------
+> # save results
+> #--------------------------------
+> save.image(file="~/dropbox/coastalkenya/results/raw/coastal-mixtures.RData")
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  3.701   0.261   4.108 
