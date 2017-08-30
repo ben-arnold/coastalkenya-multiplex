@@ -1,0 +1,715 @@
+
+R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> 
+> 
+> #--------------------------------
+> # coastal-schisto.R
+> #
+> # summarize schisto Ab results
+> # by community
+> #--------------------------------
+> 
+> #--------------------------------
+> # preamble
+> #--------------------------------
+> rm(list=ls())
+> library(SuperLearner)
+Loading required package: nnls
+Super Learner
+Version: 2.0-22
+Package created on 2016-12-10
+
+> library(tmle)
+Welcome to the tmle package, version 1.2.0-5
+
+Use tmleNews() to see details on changes and bug fixes
+Warning message:
+package ‘tmle’ was built under R version 3.3.2 
+> library(tmleAb)
+Welcome to the tmleAb package
+Targeted maximum likelihood estimation for antibody measurements.
+(Version 0.2.0)
+
+Periodically check for the latest development version using 
+devtools::install_github('ben-arnold/tmleAb')  
+
+This software is based on work funded by the National Institute of Allergy and Infectius Diseases grant K01-AI119180
+
+
+> 
+> #--------------------------------
+> # load the gaussian mixture model
+> # results for alternate LF cutoffs
+> #--------------------------------
+> load(file="~/dropbox/coastalkenya/results/raw/coastal-mixtures.RData")
+> 
+> 
+> #--------------------------------
+> # load the formatted dataset
+> #--------------------------------
+> load("~/dropbox/coastalkenya/data/final/coastal_kenya.RData")
+> d <- coastal_kenya
+> 
+> #--------------------------------
+> # identify seropositive individuals
+> #--------------------------------
+> d$psea  <- ifelse(d$sea>seamixcut,1,0)
+> d$psm25 <- ifelse(d$sm25>sm25mixcut,1,0)
+> 
+> #--------------------------------
+> # set negative and zero values to
+> # 1 before the log transform
+> #--------------------------------
+> d["sea"][d["sea"]<=0] <-1
+> d["sm25"][d["sm25"]<=0] <-1
+> 
+> #--------------------------------
+> # summarize antibody curves
+> # by community
+> #--------------------------------
+> 
+> # ensemble library
+> SL.library <-  c("SL.mean", "SL.glm", "SL.gam", "SL.loess")
+> 
+> 
+> set.seed(1234)
+> sea_curves <- lapply(unique(d$community),
++                      FUN = function(x) {
++                        agecurveAb(Y=log10(d$sea[d$community==x]),
++                                   Age=d$age[d$community==x],
++                                   SL.library=SL.library,
++                                   gamdf=2:6
++                        )
++                      }
++ )
+Loading required package: gam
+Loading required package: splines
+Loading required package: foreach
+Loaded gam 1.12
+
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk      Coef
+SL.mean_All    0.09346211 0.1883840
+SL.glm_All     0.09281943 0.4750171
+SL.gam.df3_All 0.09297766 0.3365989
+SL.loess_All   0.09365954 0.0000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk       Coef
+SL.mean_All    0.7491531 0.03817963
+SL.glm_All     0.7437624 0.00000000
+SL.gam.df6_All 0.7001237 0.96182037
+SL.loess_All   0.7050230 0.00000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk        Coef
+SL.mean_All    0.2986231 0.000973698
+SL.glm_All     0.2862059 0.057399022
+SL.gam.df5_All 0.2753067 0.941627280
+SL.loess_All   0.2779169 0.000000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk        Coef
+SL.mean_All    0.1983146 0.398987685
+SL.glm_All     0.1980153 0.599352284
+SL.gam.df2_All 0.1988372 0.000000000
+SL.loess_All   0.2006243 0.001660031
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk       Coef
+SL.mean_All    0.2373254 0.09281554
+SL.glm_All     0.2273068 0.00000000
+SL.gam.df3_All 0.2111236 0.03015217
+SL.loess_All   0.2099050 0.87703229
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk Coef
+SL.mean_All    0.3355356    0
+SL.glm_All     0.3374505    0
+SL.gam.df6_All 0.3217980    1
+SL.loess_All   0.3258066    0
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk       Coef
+SL.mean_All    0.2290796 0.01815018
+SL.glm_All     0.2161194 0.00000000
+SL.gam.df3_All 0.1998533 0.98184982
+SL.loess_All   0.2018653 0.00000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk      Coef
+SL.mean_All    0.3943941 0.3192811
+SL.glm_All     0.3967086 0.0000000
+SL.gam.df6_All 0.3921355 0.2553164
+SL.loess_All   0.3916476 0.4254025
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk      Coef
+SL.mean_All    0.2233202 0.2168891
+SL.glm_All     0.2216364 0.7831109
+SL.gam.df2_All 0.2232936 0.0000000
+SL.loess_All   0.2265457 0.0000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk      Coef
+SL.mean_All    0.1297546 0.4803162
+SL.glm_All     0.1301133 0.0000000
+SL.gam.df4_All 0.1299022 0.0000000
+SL.loess_All   0.1296988 0.5196838
+> 
+> set.seed(1234)
+> sm25_curves <- lapply(unique(d$community),
++                         FUN = function(x) {
++                           agecurveAb(Y=log10(d$sm25[d$community==x]),
++                                      Age=d$age[d$community==x],
++                                      SL.library=SL.library,
++                                      gamdf=2:6
++                           )
++                         }
++ )
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk     Coef
+SL.mean_All    0.1945280 0.849232
+SL.glm_All     0.1951432 0.150768
+SL.gam.df3_All 0.1962291 0.000000
+SL.loess_All   0.1978328 0.000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                CV-Risk       Coef
+SL.mean_All    1.260923 0.03183941
+SL.glm_All     1.169099 0.00000000
+SL.gam.df4_All 1.096714 0.72870811
+SL.loess_All   1.098340 0.23945249
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk       Coef
+SL.mean_All    0.2386885 0.46801875
+SL.glm_All     0.2407513 0.00000000
+SL.gam.df5_All 0.2384851 0.09275023
+SL.loess_All   0.2383810 0.43923102
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk      Coef
+SL.mean_All    0.2642811 0.1870354
+SL.glm_All     0.2591580 0.2360578
+SL.gam.df3_All 0.2589595 0.5769068
+SL.loess_All   0.2615699 0.0000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk     Coef
+SL.mean_All    0.1820372 0.609974
+SL.glm_All     0.1828317 0.000000
+SL.gam.df2_All 0.1824595 0.390026
+SL.loess_All   0.1876285 0.000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk      Coef
+SL.mean_All    0.2848594 0.1676037
+SL.glm_All     0.2809790 0.8323963
+SL.gam.df3_All 0.2833753 0.0000000
+SL.loess_All   0.2886725 0.0000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk      Coef
+SL.mean_All    0.2858523 0.2384939
+SL.glm_All     0.2844925 0.4546693
+SL.gam.df5_All 0.2856497 0.3068368
+SL.loess_All   0.2890385 0.0000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk Coef
+SL.mean_All    0.2966409    1
+SL.glm_All     0.2979698    0
+SL.gam.df3_All 0.3013333    0
+SL.loess_All   0.3044811    0
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk Coef
+SL.mean_All    0.3072288    1
+SL.glm_All     0.3112379    0
+SL.gam.df2_All 0.3130531    0
+SL.loess_All   0.3174952    0
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk     Coef
+SL.mean_All    0.2939331 0.577099
+SL.glm_All     0.2940819 0.422901
+SL.gam.df2_All 0.2956988 0.000000
+SL.loess_All   0.2985039 0.000000
+> 
+> 
+> #--------------------------------
+> # Estmiate village-level mean 
+> # Ab levels EY_x
+> #--------------------------------
+> 
+> # SEA
+> set.seed(1234)
+> seaEYx <- lapply(unique(d$community),FUN = function(x) {
++   tmleAb(Y=log10(d$sea[d$community==x]),
++          W=data.frame(Age=d[d$community==x,c("age")]),
++          SL.library=SL.library,gamdf=2:6)
++ })
+ Population Mean
+   Parameter Estimate:  2.1736
+   Estimated Variance:  0.00034434
+              p-value:  <2e-16
+    95% Conf Interval: (2.1373, 2.21) 
+ Population Mean
+   Parameter Estimate:  3.6207
+   Estimated Variance:  0.0027802
+              p-value:  <2e-16
+    95% Conf Interval: (3.5174, 3.7241) 
+ Population Mean
+   Parameter Estimate:  2.351
+   Estimated Variance:  0.0010474
+              p-value:  <2e-16
+    95% Conf Interval: (2.2875, 2.4144) 
+ Population Mean
+   Parameter Estimate:  2.2077
+   Estimated Variance:  0.0006749
+              p-value:  <2e-16
+    95% Conf Interval: (2.1568, 2.2586) 
+ Population Mean
+   Parameter Estimate:  2.2368
+   Estimated Variance:  0.00082514
+              p-value:  <2e-16
+    95% Conf Interval: (2.1805, 2.2931) 
+ Population Mean
+   Parameter Estimate:  2.4633
+   Estimated Variance:  0.0011902
+              p-value:  <2e-16
+    95% Conf Interval: (2.3957, 2.5309) 
+ Population Mean
+   Parameter Estimate:  2.1879
+   Estimated Variance:  0.00078632
+              p-value:  <2e-16
+    95% Conf Interval: (2.1329, 2.2429) 
+ Population Mean
+   Parameter Estimate:  2.7365
+   Estimated Variance:  0.0014029
+              p-value:  <2e-16
+    95% Conf Interval: (2.663, 2.8099) 
+ Population Mean
+   Parameter Estimate:  2.2964
+   Estimated Variance:  0.0007748
+              p-value:  <2e-16
+    95% Conf Interval: (2.2418, 2.3509) 
+ Population Mean
+   Parameter Estimate:  2.246
+   Estimated Variance:  0.00043624
+              p-value:  <2e-16
+    95% Conf Interval: (2.205, 2.2869) 
+> 
+> # Sm25
+> set.seed(1234)
+> sm25EYx <- lapply(unique(d$community),FUN = function(x) {
++   tmleAb(Y=log10(d$sm25[d$community==x]),
++          W=data.frame(Age=d[d$community==x,c("age")]),
++          SL.library=SL.library,gamdf=2:6)
++ })
+ Population Mean
+   Parameter Estimate:  0.91872
+   Estimated Variance:  0.0007148
+              p-value:  <2e-16
+    95% Conf Interval: (0.86632, 0.97113) 
+ Population Mean
+   Parameter Estimate:  1.8866
+   Estimated Variance:  0.0046789
+              p-value:  <2e-16
+    95% Conf Interval: (1.7525, 2.0206) 
+ Population Mean
+   Parameter Estimate:  0.65374
+   Estimated Variance:  0.0008392
+              p-value:  <2e-16
+    95% Conf Interval: (0.59697, 0.71052) 
+ Population Mean
+   Parameter Estimate:  0.66956
+   Estimated Variance:  0.00090263
+              p-value:  <2e-16
+    95% Conf Interval: (0.61067, 0.72844) 
+ Population Mean
+   Parameter Estimate:  0.61656
+   Estimated Variance:  0.0006315
+              p-value:  <2e-16
+    95% Conf Interval: (0.56731, 0.66582) 
+ Population Mean
+   Parameter Estimate:  0.62816
+   Estimated Variance:  0.00101
+              p-value:  <2e-16
+    95% Conf Interval: (0.56587, 0.69045) 
+ Population Mean
+   Parameter Estimate:  0.64957
+   Estimated Variance:  0.00098134
+              p-value:  <2e-16
+    95% Conf Interval: (0.58817, 0.71097) 
+ Population Mean
+   Parameter Estimate:  0.71982
+   Estimated Variance:  0.0010566
+              p-value:  <2e-16
+    95% Conf Interval: (0.65611, 0.78353) 
+ Population Mean
+   Parameter Estimate:  0.84348
+   Estimated Variance:  0.0010662
+              p-value:  <2e-16
+    95% Conf Interval: (0.77948, 0.90748) 
+ Population Mean
+   Parameter Estimate:  0.69541
+   Estimated Variance:  0.00099033
+              p-value:  <2e-16
+    95% Conf Interval: (0.63373, 0.75709) 
+> 
+> 
+> #--------------------------------
+> # pull out means, lb and ub
+> # from the TMLE fitted objects
+> #--------------------------------
+> getpsi <- function(x) {
++   ests <- sapply(x, function(xx) c(xx$psi,xx$lb,xx$ub))
++   rownames(ests) <- c("psi","lb","ub") 
++   colnames(ests) <- 1:10
++   return(ests)
++ }
+> 
+> seaEYxs <- getpsi(seaEYx)
+> sm25EYxs  <- getpsi(sm25EYx)
+> 
+> 
+> #--------------------------------
+> # seroprevalence curves
+> # by community
+> #--------------------------------
+> 
+> set.seed(1234)
+> psea_curves <- lapply(unique(d$community),
++                        FUN = function(x) {
++                          agecurveAb(Y=d$psea[d$community==x],
++                                     Age=d$age[d$community==x],
++                                     SL.library=SL.library,
++                                     gamdf=2:6
++                          )
++                        }
++ )
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk      Coef
+SL.mean_All    0.04611739 0.2855802
+SL.glm_All     0.04647577 0.0000000
+SL.gam.df4_All 0.04537976 0.0000000
+SL.loess_All   0.04545033 0.7144198
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk       Coef
+SL.mean_All    0.1477563 0.05244755
+SL.glm_All     0.1472765 0.00000000
+SL.gam.df6_All 0.1348003 0.94755245
+SL.loess_All   0.1360206 0.00000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk       Coef
+SL.mean_All    0.1601212 0.06051494
+SL.glm_All     0.1553683 0.16115711
+SL.gam.df3_All 0.1546319 0.35227331
+SL.loess_All   0.1549150 0.42605464
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk       Coef
+SL.mean_All    0.1099174 0.69367000
+SL.glm_All     0.1100529 0.00000000
+SL.gam.df2_All 0.1100518 0.08877671
+SL.loess_All   0.1107745 0.21755329
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk       Coef
+SL.mean_All    0.1206906 0.07862437
+SL.glm_All     0.1123386 0.04738976
+SL.gam.df3_All 0.1085360 0.29693612
+SL.loess_All   0.1087994 0.57704975
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk      Coef
+SL.mean_All    0.2174564 0.2391285
+SL.glm_All     0.2188724 0.0000000
+SL.gam.df5_All 0.2111035 0.0000000
+SL.loess_All   0.2101992 0.7608715
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk       Coef
+SL.mean_All    0.09905022 0.08612092
+SL.glm_All     0.09606096 0.04024187
+SL.gam.df3_All 0.09364715 0.87363721
+SL.loess_All   0.09418896 0.00000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk      Coef
+SL.mean_All    0.2500992 0.3543485
+SL.glm_All     0.2500371 0.0000000
+SL.gam.df6_All 0.2487744 0.6456515
+SL.loess_All   0.2495533 0.0000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk        Coef
+SL.mean_All    0.1493244 0.162071848
+SL.glm_All     0.1481679 0.758649378
+SL.gam.df3_All 0.1487643 0.004567035
+SL.loess_All   0.1496233 0.074711738
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk      Coef
+SL.mean_All    0.08600406 0.3864065
+SL.glm_All     0.08643332 0.0000000
+SL.gam.df2_All 0.08575905 0.6135935
+SL.loess_All   0.08657293 0.0000000
+> 
+> set.seed(1234)
+> psm25_curves <- lapply(unique(d$community),
++                       FUN = function(x) {
++                         agecurveAb(Y=d$psm25[d$community==x],
++                                    Age=d$age[d$community==x],
++                                    SL.library=SL.library,
++                                    gamdf=2:6
++                         )
++                       }
++ )
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk Coef
+SL.mean_All    0.08446214    1
+SL.glm_All     0.08572774    0
+SL.gam.df2_All 0.08588318    0
+SL.loess_All   0.08608480    0
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                 CV-Risk       Coef
+SL.mean_All    0.2421285 0.03072827
+SL.glm_All     0.2329914 0.00000000
+SL.gam.df4_All 0.2156719 0.30179208
+SL.loess_All   0.2157360 0.66747965
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk Coef
+SL.mean_All    0.05061753    1
+SL.glm_All     0.05135411    0
+SL.gam.df3_All 0.05174443    0
+SL.loess_All   0.05171982    0
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk       Coef
+SL.mean_All    0.05275132 0.09680337
+SL.glm_All     0.05220693 0.90319663
+SL.gam.df3_All 0.05326995 0.00000000
+SL.loess_All   0.05381271 0.00000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk Coef
+SL.mean_All    0.02719788    1
+SL.glm_All     0.02732075    0
+SL.gam.df6_All 0.02758003    0
+SL.loess_All   0.02769191    0
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk      Coef
+SL.mean_All    0.06315315 0.2917754
+SL.glm_All     0.06326710 0.0000000
+SL.gam.df3_All 0.06231886 0.0000000
+SL.loess_All   0.06238326 0.7082246
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk       Coef
+SL.mean_All    0.05848417 0.92269586
+SL.glm_All     0.05871220 0.07730414
+SL.gam.df2_All 0.05895367 0.00000000
+SL.loess_All   0.05980361 0.00000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk      Coef
+SL.mean_All    0.07879819 0.7415363
+SL.glm_All     0.07890247 0.2584637
+SL.gam.df2_All 0.07901534 0.0000000
+SL.loess_All   0.07996550 0.0000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk       Coef
+SL.mean_All    0.09439040 0.98854133
+SL.glm_All     0.09478107 0.01145867
+SL.gam.df2_All 0.09537594 0.00000000
+SL.loess_All   0.09852671 0.00000000
+
+Summary of SuperLearner cross validated risk and 
+weights for algorithms included in the library:
+
+                  CV-Risk      Coef
+SL.mean_All    0.06610333 0.3794093
+SL.glm_All     0.06614273 0.0000000
+SL.gam.df3_All 0.06572576 0.0000000
+SL.loess_All   0.06575532 0.6205907
+> 
+> 
+> #--------------------------------
+> # fn to estimate prev + exact 95% cis
+> #--------------------------------
+> exactprev <- function(x) {
++   # x : a binary indicator of seropositive(1) vs. seronegative(0)
++   tabx <- table(x)
++   if(length(tabx)<2) {
++     if(names(tabx)=="1") {
++       tabx <- c(0,tabx)
++     } else{
++       tabx <- c(tabx,0)
++     }
++   } 
++   estx <- binom.test(x=tabx[2],n=sum(tabx))
++   res <- c(estx$parameter,estx$statistic,estx$estimate,estx$conf.int)
++   names(res) <- c("N","n","prev","min95","max95")
++   return(res)
++ }
+> 
+> #--------------------------------
+> # SEA seroprevalence by community
+> #--------------------------------
+> seap <- tapply(d$psea,d$community,exactprev)
+> seap <- matrix(unlist(seap),nrow=10,ncol=5,byrow=T)
+> sea_prev <- data.frame(community=1:10,seap)
+> names(sea_prev) <- c("community","N","n","prev","min95","max95")
+> round(sea_prev,3)
+   community   N   n  prev min95 max95
+1          1 271  13 0.048 0.026 0.081
+2          2 269 221 0.822 0.770 0.865
+3          3 283  56 0.198 0.153 0.249
+4          4 291  36 0.124 0.088 0.167
+5          5 287  40 0.139 0.101 0.185
+6          6 282  89 0.316 0.262 0.373
+7          7 290  32 0.110 0.077 0.152
+8          8 280 129 0.461 0.401 0.521
+9          9 287  52 0.181 0.138 0.231
+10        10 297  28 0.094 0.064 0.133
+> 
+> #--------------------------------
+> # Sm25 seroprevalence by community
+> #--------------------------------
+> sm25p <- tapply(d$psm25,d$community,exactprev)
+> sm25p <- matrix(unlist(sm25p),nrow=10,ncol=5,byrow=T)
+> sm25_prev <- data.frame(community=1:10,sm25p)
+> names(sm25_prev) <- c("community","N","n","prev","min95","max95")
+> round(sm25_prev,3)
+   community   N   n  prev min95 max95
+1          1 271  25 0.092 0.061 0.133
+2          2 269 162 0.602 0.541 0.661
+3          3 283  15 0.053 0.030 0.086
+4          4 291  16 0.055 0.032 0.088
+5          5 287   8 0.028 0.012 0.054
+6          6 282  19 0.067 0.041 0.103
+7          7 290  18 0.062 0.037 0.096
+8          8 280  24 0.086 0.056 0.125
+9          9 287  30 0.105 0.072 0.146
+10        10 297  21 0.071 0.044 0.106
+> 
+> #--------------------------------
+> # save results
+> #--------------------------------
+> save.image(file="~/dropbox/coastalkenya/results/raw/coastal-schisto.RData")
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+ 60.561   0.742  63.276 
