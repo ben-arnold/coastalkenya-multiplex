@@ -27,8 +27,11 @@ d <- coastal_kenya
 # cutoff values sent from jeff priest
 #--------------------------------
 d$pmeasles <- ifelse(d$measles > 178,1,0)
-d$pdiptheria <- ifelse(d$diptheria > 4393,1,0)
+d$pdiphtheria <- ifelse(d$diphtheria > 4393,1,0)
 d$ptetanus <- ifelse(d$tetanus > 118, 1, 0)
+
+# identify partial protection for diphtheria
+d$ppdiphtheria <- ifelse(d$diphtheria > 183,1,0)
 
 #--------------------------------
 # estimate antibody mean curves
@@ -52,7 +55,7 @@ mea_curves <- lapply(unique(d$community),
 set.seed(1234)
 dip_curves <- lapply(unique(d$community),
                       FUN = function(x) {
-                        agecurveAb(Y=log10(d$diptheria[d$community==x]),
+                        agecurveAb(Y=log10(d$diphtheria[d$community==x]),
                                    Age=d$age[d$community==x],
                                    SL.library=SL.library,
                                    gamdf=2:6
@@ -84,10 +87,10 @@ meaEYx <- lapply(unique(d$community),FUN = function(x) {
          SL.library=SL.library)
 })
 
-# diptheria
+# diphtheria
 set.seed(1234)
 dipEYx <- lapply(unique(d$community),FUN = function(x) {
-  tmleAb(Y=log10(d$diptheria[d$community==x]),
+  tmleAb(Y=log10(d$diphtheria[d$community==x]),
          W=data.frame(Age=d[d$community==x,c("age")]),
          SL.library=SL.library)
 })
@@ -133,7 +136,7 @@ pmea_curves <- lapply(unique(d$community),
 set.seed(1234)
 pdip_curves <- lapply(unique(d$community),
                       FUN = function(x) {
-                        agecurveAb(Y=d$pdiptheria[d$community==x],
+                        agecurveAb(Y=d$pdiphtheria[d$community==x],
                                    Age=d$age[d$community==x],
                                    SL.library=SL.library
                         )
@@ -163,10 +166,18 @@ pmeaEYx <- lapply(unique(d$community),FUN = function(x) {
          SL.library=SL.library)
 })
 
-# diptheria
+# diphtheria
 set.seed(1234)
 pdipEYx <- lapply(unique(d$community),FUN = function(x) {
-  tmleAb(Y=d$pdiptheria[d$community==x],
+  tmleAb(Y=d$pdiphtheria[d$community==x],
+         W=data.frame(Age=d[d$community==x,c("age")]),
+         SL.library=SL.library)
+})
+
+# diphtheria partial protection
+set.seed(1234)
+ppdipEYx <- lapply(unique(d$community),FUN = function(x) {
+  tmleAb(Y=d$ppdiphtheria[d$community==x],
          W=data.frame(Age=d[d$community==x,c("age")]),
          SL.library=SL.library)
 })
@@ -187,6 +198,8 @@ pmeaEYxs   <- getpsi(pmeaEYx)
 pdipEYxs <- getpsi(pdipEYx)
 ptetEYxs <- getpsi(ptetEYx)
 
+# partial protection for diphtheria
+ppdipEYxs <- getpsi(ppdipEYx)
 
 #--------------------------------
 # save results

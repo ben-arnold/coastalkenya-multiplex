@@ -139,12 +139,18 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
 # mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Seroprotection, by community",side=3,line=0.5,adj=0)
+mtext("Seroprotection and partial protection, by community",side=3,line=0.5,adj=0)
 mtext("Community",side=1,line=3)
 
 arrows(x0=1:10,y0=pdipEYxs[2,vord],y1=pdipEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,pdipEYxs[1,vord],pch=19,col=cols)
+text(1,0.45,"Seroprotection",adj=0)
 
+  # partial protection
+  arrows(x0=1:10,y0=ppdipEYxs[2,vord],y1=ppdipEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
+  points(1:10,ppdipEYxs[1,vord],pch=21,col=cols,bg="white")
+  text(1,0.95,"Partial protection",adj=0)
+  
 
 # Tetanus
 plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",

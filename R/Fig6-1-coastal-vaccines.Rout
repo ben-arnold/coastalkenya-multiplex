@@ -1,7 +1,7 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
+R version 3.4.1 (2017-06-30) -- "Single Candle"
 Copyright (C) 2017 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -36,7 +36,7 @@ Type 'q()' to quit R.
 Loading required package: nnls
 Super Learner
 Version: 2.0-22
-Package created on 2016-12-10
+Package created on 2017-07-18
 
 > library(tmle)
 Welcome to the tmle package, version 1.2.0-5
@@ -45,7 +45,7 @@ Use tmleNews() to see details on changes and bug fixes
 > library(tmleAb)
 Welcome to the tmleAb package
 Targeted maximum likelihood estimation for antibody measurements.
-(Version 0.3.2, release date 2017-07-21)
+(Version 0.3.3, release date 2017-08-10)
 
 Periodically check for the latest development version using 
 devtools::install_github('ben-arnold/tmleAb')  
@@ -68,8 +68,11 @@ grant K01-AI119180
 > # cutoff values sent from jeff priest
 > #--------------------------------
 > d$pmeasles <- ifelse(d$measles > 178,1,0)
-> d$pdiptheria <- ifelse(d$diptheria > 4393,1,0)
+> d$pdiphtheria <- ifelse(d$diphtheria > 4393,1,0)
 > d$ptetanus <- ifelse(d$tetanus > 118, 1, 0)
+> 
+> # identify partial protection for diphtheria
+> d$ppdiphtheria <- ifelse(d$diphtheria > 183,1,0)
 > 
 > #--------------------------------
 > # estimate antibody mean curves
@@ -92,7 +95,7 @@ grant K01-AI119180
 Loading required package: gam
 Loading required package: splines
 Loading required package: foreach
-Loaded gam 1.14
+Loaded gam 1.14-4
 
 
 Summary of SuperLearner cross validated risk and 
@@ -188,7 +191,7 @@ SL.loess_All   0.3247193    0
 > set.seed(1234)
 > dip_curves <- lapply(unique(d$community),
 +                       FUN = function(x) {
-+                         agecurveAb(Y=log10(d$diptheria[d$community==x]),
++                         agecurveAb(Y=log10(d$diphtheria[d$community==x]),
 +                                    Age=d$age[d$community==x],
 +                                    SL.library=SL.library,
 +                                    gamdf=2:6
@@ -450,10 +453,10 @@ SL.loess_All   0.7710453    0
               p-value:  <2e-16
     95% Conf Interval: (3.5752, 3.7369) 
 > 
-> # diptheria
+> # diphtheria
 > set.seed(1234)
 > dipEYx <- lapply(unique(d$community),FUN = function(x) {
-+   tmleAb(Y=log10(d$diptheria[d$community==x]),
++   tmleAb(Y=log10(d$diphtheria[d$community==x]),
 +          W=data.frame(Age=d[d$community==x,c("age")]),
 +          SL.library=SL.library)
 + })
@@ -689,7 +692,7 @@ SL.loess_All   0.00672370 0.539930494
 > set.seed(1234)
 > pdip_curves <- lapply(unique(d$community),
 +                       FUN = function(x) {
-+                         agecurveAb(Y=d$pdiptheria[d$community==x],
++                         agecurveAb(Y=d$pdiphtheria[d$community==x],
 +                                    Age=d$age[d$community==x],
 +                                    SL.library=SL.library
 +                         )
@@ -949,10 +952,10 @@ SL.loess_All   0.09143869 0.00000000
               p-value:  <2e-16
     95% Conf Interval: (0.98395, 1.0026) 
 > 
-> # diptheria
+> # diphtheria
 > set.seed(1234)
 > pdipEYx <- lapply(unique(d$community),FUN = function(x) {
-+   tmleAb(Y=d$pdiptheria[d$community==x],
++   tmleAb(Y=d$pdiphtheria[d$community==x],
 +          W=data.frame(Age=d[d$community==x,c("age")]),
 +          SL.library=SL.library)
 + })
@@ -1006,6 +1009,64 @@ SL.loess_All   0.09143869 0.00000000
    Estimated Variance:  0.00074301
               p-value:  <2e-16
     95% Conf Interval: (0.27317, 0.38003) 
+> 
+> # diphtheria partial protection
+> set.seed(1234)
+> ppdipEYx <- lapply(unique(d$community),FUN = function(x) {
++   tmleAb(Y=d$ppdiphtheria[d$community==x],
++          W=data.frame(Age=d[d$community==x,c("age")]),
++          SL.library=SL.library)
++ })
+ Population Mean
+   Parameter Estimate:  0.86347
+   Estimated Variance:  0.00043663
+              p-value:  <2e-16
+    95% Conf Interval: (0.82251, 0.90442) 
+ Population Mean
+   Parameter Estimate:  0.7026
+   Estimated Variance:  0.00077967
+              p-value:  <2e-16
+    95% Conf Interval: (0.64787, 0.75733) 
+ Population Mean
+   Parameter Estimate:  0.79859
+   Estimated Variance:  0.00057038
+              p-value:  <2e-16
+    95% Conf Interval: (0.75178, 0.8454) 
+ Population Mean
+   Parameter Estimate:  0.86942
+   Estimated Variance:  0.00039149
+              p-value:  <2e-16
+    95% Conf Interval: (0.83064, 0.9082) 
+ Population Mean
+   Parameter Estimate:  0.83275
+   Estimated Variance:  0.00048698
+              p-value:  <2e-16
+    95% Conf Interval: (0.7895, 0.87601) 
+ Population Mean
+   Parameter Estimate:  0.86525
+   Estimated Variance:  0.00041492
+              p-value:  <2e-16
+    95% Conf Interval: (0.82532, 0.90517) 
+ Population Mean
+   Parameter Estimate:  0.78966
+   Estimated Variance:  0.00057474
+              p-value:  <2e-16
+    95% Conf Interval: (0.74267, 0.83664) 
+ Population Mean
+   Parameter Estimate:  0.84286
+   Estimated Variance:  0.00047473
+              p-value:  <2e-16
+    95% Conf Interval: (0.80015, 0.88556) 
+ Population Mean
+   Parameter Estimate:  0.78397
+   Estimated Variance:  0.00059217
+              p-value:  <2e-16
+    95% Conf Interval: (0.73628, 0.83167) 
+ Population Mean
+   Parameter Estimate:  0.88215
+   Estimated Variance:  0.00035121
+              p-value:  <2e-16
+    95% Conf Interval: (0.84542, 0.91889) 
 > 
 > # tetanus
 > set.seed(1234)
@@ -1073,6 +1134,8 @@ SL.loess_All   0.09143869 0.00000000
 > pdipEYxs <- getpsi(pdipEYx)
 > ptetEYxs <- getpsi(ptetEYx)
 > 
+> # partial protection for diphtheria
+> ppdipEYxs <- getpsi(ppdipEYx)
 > 
 > #--------------------------------
 > # save results
@@ -1085,4 +1148,4 @@ SL.loess_All   0.09143869 0.00000000
 > 
 > proc.time()
    user  system elapsed 
-172.971   1.605 176.481 
+ 69.002   1.243  71.524 
