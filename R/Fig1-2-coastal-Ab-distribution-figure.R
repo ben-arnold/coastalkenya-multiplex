@@ -85,8 +85,8 @@ denplot <- function(x,col,main,header=NULL,xlab=NULL,cutoff=NULL,cutoffmix=NULL,
   ), las=1,cex.axis=1.25
   )
   mtext(header,side=3,line=3,adj=0,at=-0.5,cex=1.25,font=2)
-  mtext(main,side=3,line=1,adj=0,cex=1)
-  mtext(xlab,side=1,line=2.5,cex=1)
+  mtext(main,side=3,line=1,adj=0,cex=1.1)
+  mtext(xlab,side=1,line=2.5,cex=1.1)
   polygon(dest,col=alpha(col,alpha=0.75),border=col)
   
   if(!is.null(cutoff)){
@@ -96,7 +96,7 @@ denplot <- function(x,col,main,header=NULL,xlab=NULL,cutoff=NULL,cutoffmix=NULL,
     segments(x0=cutoffmix,y0=min(ytics),y1=max(ytics),col="gray20",lty=2)
   }
   if(!is.null(cutoff) | !is.null(cutoffmix)){
-    text(x=max(cutoff,cutoffmix),y=1.1,cutlab,col="gray20",pos=4)
+    text(x=max(cutoff,cutoffmix),y=1.1,cutlab,col="gray20",pos=4,cex=1.2)
   }
 
 }
@@ -170,14 +170,14 @@ denplot(log10(d$nie),col=cols[5],main=expression(paste(italic('Strongyloides ste
         header="Other helminths",xlab="Antibody response (MFI-bg)",
         cutoff=log10(628),cutoffmix=log10(niemixcut),cutlab="Seropositive")
 
-denplot(log10(d$ascaris),col=cols[5],main=expression(paste(italic('Ascaris')," AsHb")),
+denplot(log10(d$ascaris),col=cols[5],main=expression(paste(italic('Ascaris')," spp. AsHb")),
         xlab="Antibody response (MFI-bg)",
         cutoff=log10(386),cutoffmix=log10(ascarismixcut),cutlab="Seropositive")
 
 # empty
-plot(1,1,type="n",yaxt="n",xaxt="n",ylab="",xlab="",bty="n")
-legend("left",legend=c("Cutoff from standard curve (vaccine prev)\nor unexposed US adults (others)","Cutoff from Gaussian mixture model"),
-       lty=c(1,2),col="gray20",bty="n",cex=1.25)
+plot(1,1,type="n",yaxt="n",xaxt="n",ylab="",xlab="",bty="n",ylim=c(0,1),xlim=c(0,1))
+legend(0,0.75,legend=c("Cutoff from standard curve\n(vaccine prev), or unexposed\nUS adults (others)","Cutoff from Gaussian mixture\nmodel"),
+       lty=c(1,2),col="gray20",bty="n",cex=1.6)
 
 
 par(op)

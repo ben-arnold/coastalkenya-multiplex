@@ -1,7 +1,7 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
-Copyright (C) 2017 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
+R version 3.5.3 (2019-03-11) -- "Great Truth"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -98,13 +98,15 @@ Type 'q()' to quit R.
 +   expression(10^3),
 +   expression(10^4),
 +   expression(10^5)), las=1,cex.axis=1.25)
-> mtext("Antibody response (MFI-bg)",side=2,line=3)
-> mtext("Age-dependent response, by community",side=3,line=0.5,adj=0,cex=1)
-> mtext("Measles MV-N",side=3,line=2,adj=0,cex=1.25,font=2)
+> mtext("Antibody response (MFI-bg)",side=2,line=3,cex=1.1)
+> mtext("Age-dependent mean response, by community",side=3,line=2.5,adj=0.5,cex=1.1)
+> mtext("Measles MV-N",side=3,line=0.5,adj=0,cex=1.1,font=1)
+> mtext("A",side=3,line=2.5,adj=0,at=-10,cex=1.5,font=2)
+> 
 > 
 > # add seroprotection limit (from jeff priest)
 > segments(x0=min(xtics),x1=max(xtics),y0=log10(178),lty=1,col="gray50")
-> text(x=mean(xtics),y=log10(125),"Seroprotection limit",col="gray50")
+> text(x=mean(xtics),y=log10(125),"Seroprotection limit",col="gray20",cex=1.1)
 > 
 > j <- 1
 > for(i in vord){ 
@@ -123,13 +125,13 @@ Type 'q()' to quit R.
 +   expression(10^3),
 +   expression(10^4),
 +   expression(10^5)), las=1,cex.axis=1.25)
-> mtext("Antibody response (MFI-bg)",side=2,line=3)
-> mtext("Age-dependent response, by community",side=3,line=0.5,adj=0,cex=1)
-> mtext("Diphtheria toxoid",side=3,line=2,adj=0,cex=1.25,font=2)
+> mtext("Antibody response (MFI-bg)",side=2,line=3,cex=1.1)
+> # mtext("Age-dependent response, by community",side=3,line=0.5,adj=0,cex=1)
+> mtext("Diphtheria toxoid",side=3,line=0.5,adj=0,cex=1.1,font=1)
 > 
 > # add seroprotection limit (from jeff priest)
 > segments(x0=min(xtics),x1=max(xtics),y0=log10(4393),lty=1,col="gray50")
-> text(x=mean(xtics),y=log10(6000),"Seroprotection limit",col="gray50")
+> text(x=mean(xtics),y=log10(6000),"Seroprotection limit",col="gray20",cex=1.1)
 > 
 > j <- 1
 > for(i in vord){ 
@@ -147,14 +149,14 @@ Type 'q()' to quit R.
 +   expression(10^3),
 +   expression(10^4),
 +   expression(10^5)), las=1,cex.axis=1.25)
-> mtext("Age, years",side=1,line=2.5)
-> mtext("Antibody response (MFI-bg)",side=2,line=3)
-> mtext("Age-dependent response, by community",side=3,line=0.5,adj=0,cex=1)
-> mtext("Tetanus toxoid",side=3,line=2,adj=0,cex=1.25,font=2)
+> mtext("Age, years",side=1,line=3,cex=1.1)
+> mtext("Antibody response (MFI-bg)",side=2,line=3,cex=1.1)
+> # mtext("Age-dependent response, by community",side=3,line=0.5,adj=0,cex=1)
+> mtext("Tetanus toxoid",side=3,line=0.5,adj=0,cex=1.1,font=1)
 > 
 > # add seroprotection limit (from jeff priest)
 > segments(x0=min(xtics),x1=max(xtics),y0=log10(118),lty=1,col="gray50")
-> text(x=mean(xtics),y=log10(80),"Seroprotection limit",col="gray50")
+> text(x=mean(xtics),y=log10(80),"Seroprotection limit",col="gray20",cex=1.1)
 > 
 > j <- 1
 > for(i in vord){ 
@@ -177,14 +179,14 @@ Type 'q()' to quit R.
 +   expression(10^4),
 +   expression(10^5)), las=1,cex.axis=1.25)
 > mtext(1:10,side=1,line=0,at=1:10,col=cols)
-> mtext("Mean response, by community",side=3,line=0.5,adj=0)
+> mtext("Mean response, by community",side=3,line=2.5,adj=0.5,cex=1.1)
 > 
 > arrows(x0=1:10,y0=meaEYxs[2,vord],y1=meaEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 > points(1:10,meaEYxs[1,vord],pch=19,col=cols)
 > 
 > # add seroprotection limit (from jeff priest)
 > segments(x0=min(xtics),x1=max(xtics),y0=log10(178),lty=1,col="gray50")
-> text(x=mean(xtics),y=log10(125),"Seroprotection limit",col="gray50")
+> text(x=mean(xtics),y=log10(125),"Seroprotection limit",col="gray20",cex=1.1)
 > 
 > # diphtheria
 > plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
@@ -196,14 +198,14 @@ Type 'q()' to quit R.
 +   expression(10^4),
 +   expression(10^5)), las=1,cex.axis=1.25)
 > mtext(1:10,side=1,line=0,at=1:10,col=cols)
-> mtext("Mean response, by community",side=3,line=0.5,adj=0)
+> # mtext("Mean response, by community",side=3,line=0.5,adj=0)
 > 
 > arrows(x0=1:10,y0=dipEYxs[2,vord],y1=dipEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 > points(1:10,dipEYxs[1,vord],pch=19,col=cols)
 > 
 > # add seroprotection limit (from jeff priest)
 > segments(x0=min(xtics),x1=max(xtics),y0=log10(4393),lty=1,col="gray50")
-> text(x=mean(xtics),y=log10(6000),"Seroprotection limit",col="gray50")
+> text(x=mean(xtics),y=log10(6000),"Seroprotection limit",col="gray20",cex=1.1)
 > 
 > # Tetanus
 > plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
@@ -215,15 +217,15 @@ Type 'q()' to quit R.
 +   expression(10^4),
 +   expression(10^5)), las=1,cex.axis=1.25)
 > mtext(1:10,side=1,line=0,at=1:10,col=cols)
-> mtext("Mean response, by community",side=3,line=0.5,adj=0)
-> mtext("Community",side=1,line=2.5)
+> # mtext("Mean response, by community",side=3,line=0.5,adj=0)
+> mtext("Community",side=1,line=3)
 > 
 > arrows(x0=1:10,y0=tetEYxs[2,vord],y1=tetEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 > points(1:10,tetEYxs[1,vord],pch=19,col=cols)
 > 
 > # add seroprotection limit (from jeff priest)
 > segments(x0=min(xtics),x1=max(xtics),y0=log10(118),lty=1,col="gray50")
-> text(x=mean(xtics),y=log10(80),"Seroprotection limit",col="gray50")
+> text(x=mean(xtics),y=log10(80),"Seroprotection limit",col="gray20",cex=1.1)
 > 
 > 
 > 
@@ -238,9 +240,12 @@ Type 'q()' to quit R.
 +      xlim=range(xtics),ylim=range(ytics),bty="n")
 > axis(1,at=xtics,las=1,cex.axis=1.5)
 > axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
-> mtext("Age-dependent seroprotection, by community",side=3,line=0.5,adj=0,cex=1)
-> mtext("Age, years",side=1,line=3)
-> mtext("Seroprotection (%)",side=2,line=3)
+> mtext("Age-dependent seroprotection, by community",side=3,line=2.5,adj=0.5,cex=1.1)
+> # mtext("Age, years",side=1,line=3)
+> mtext("Seroprotection (%)",side=2,line=3,cex=1.1)
+> mtext("Measles MV-N",side=3,line=0.5,adj=0,cex=1.1,font=1)
+> mtext("B",side=3,line=2.5,adj=0,at=-15,cex=1.5,font=2)
+> 
 > j <- 1
 > for(i in vord){ 
 +   lines(pmea_curves[[i]]$Age,pmea_curves[[i]]$pY,col=cols[j])
@@ -255,9 +260,11 @@ Type 'q()' to quit R.
 +      xlim=range(xtics),ylim=range(ytics),bty="n")
 > axis(1,at=xtics,las=1,cex.axis=1.5)
 > axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
-> mtext("Age-dependent seroprotection, by community",side=3,line=0.5,adj=0,cex=1)
-> mtext("Age, years",side=1,line=3)
-> mtext("Seroprotection (%)",side=2,line=3)
+> # mtext("Age-dependent seroprotection, by community",side=3,line=0.5,adj=0,cex=1)
+> # mtext("Age, years",side=1,line=3)
+> mtext("Seroprotection (%)",side=2,line=3,cex=1.1)
+> mtext("Diphtheria toxoid",side=3,line=0.5,adj=0,cex=1.1,font=1)
+> 
 > j <- 1
 > for(i in vord){ 
 +   lines(pdip_curves[[i]]$Age,pdip_curves[[i]]$pY,col=cols[j])
@@ -272,9 +279,11 @@ Type 'q()' to quit R.
 +      xlim=range(xtics),ylim=range(ytics),bty="n")
 > axis(1,at=xtics,las=1,cex.axis=1.5)
 > axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
-> mtext("Age-dependent seroprotection, by community",side=3,line=0.5,adj=0,cex=1)
-> mtext("Age, years",side=1,line=3)
-> mtext("Seroprotection (%)",side=2,line=3)
+> # mtext("Age-dependent seroprotection, by community",side=3,line=0.5,adj=0,cex=1)
+> mtext("Age, years",side=1,line=3,cex=1.1)
+> mtext("Seroprotection (%)",side=2,line=3,cex=1.1)
+> mtext("Tetanus toxoid",side=3,line=0.5,adj=0,cex=1.1,font=1)
+> 
 > j <- 1
 > for(i in vord){ 
 +   lines(ptet_curves[[i]]$Age,ptet_curves[[i]]$pY,col=cols[j])
@@ -292,9 +301,8 @@ Type 'q()' to quit R.
 +      xlim=range(xtics),ylim=range(ytics),bty="n")
 > axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 > mtext(1:10,side=1,line=0,at=1:10,col=cols)
-> # mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-> mtext("Seroprotection, by community",side=3,line=0.5,adj=0)
-> mtext("Community",side=1,line=3)
+> mtext("Seroprotection, by community",side=3,line=2.5,adj=0.5,cex=1.1)
+> # mtext("Community",side=1,line=3)
 > 
 > arrows(x0=1:10,y0=pmeaEYxs[2,vord],y1=pmeaEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 > points(1:10,pmeaEYxs[1,vord],pch=19,col=cols)
@@ -305,9 +313,8 @@ Type 'q()' to quit R.
 +      xlim=range(xtics),ylim=range(ytics),bty="n")
 > axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 > mtext(1:10,side=1,line=0,at=1:10,col=cols)
-> # mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-> mtext("Seroprotection, by community",side=3,line=0.5,adj=0)
-> mtext("Community",side=1,line=3)
+> # mtext("Seroprotection, by community",side=3,line=0.5,adj=0)
+> # mtext("Community",side=1,line=3)
 > 
 > arrows(x0=1:10,y0=pdipEYxs[2,vord],y1=pdipEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 > points(1:10,pdipEYxs[1,vord],pch=19,col=cols)
@@ -318,24 +325,11 @@ Type 'q()' to quit R.
 +      xlim=range(xtics),ylim=range(ytics),bty="n")
 > axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 > mtext(1:10,side=1,line=0,at=1:10,col=cols)
-> # mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-> mtext("Seroprotection, by community",side=3,line=0.5,adj=0)
-> mtext("Community",side=1,line=3)
+> # mtext("Seroprotection, by community",side=3,line=0.5,adj=0)
+> mtext("Community",side=1,line=3,cex=1.1)
 > 
 > arrows(x0=1:10,y0=ptetEYxs[2,vord],y1=ptetEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 > points(1:10,ptetEYxs[1,vord],pch=19,col=cols)
-> 
-> 
-> #--------------------------------
-> # add a community name key along the bottom
-> #--------------------------------
-> # resetplot <- function() {
-> #   layout(mat=matrix(1))
-> #   par(mfrow=c(1, 1), oma=rep(0, 4), mar=rep(0, 4), new=TRUE)
-> #   plot(0:1, 0:1, type="n", xlab="", ylab="", axes=FALSE)
-> # }
-> # resetplot()
-> # legend('bottom',legend=paste(1:10,vordn),text.col=cols,ncol=5,bty="n",xpd=NA)
 > 
 > 
 > #--------------------------------
@@ -382,4 +376,4 @@ null device
 > 
 > proc.time()
    user  system elapsed 
-  4.066   0.185   4.371 
+  2.157   0.125   2.284 

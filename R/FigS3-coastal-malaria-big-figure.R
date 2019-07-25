@@ -35,11 +35,6 @@ cols <- c(cblack,"gray40",cred,corange,cchartr,cgreen,cteal,cblue,cmagent, cbPal
 #--------------------------------
 load(file="~/dropbox/coastalkenya/results/raw/coastal-malaria.RData")
 
-# order all villages in this figure
-# by CSP seroprevalence
-# vord <- order(pcspEYxs[1,],decreasing=TRUE)
-# vordn <- unique(d$cname[order(d$community)])[vord]
-
 # order all villages by county and from south to north
 vordn <- c("Kimorigo","Makwenyeni","Mirihini","Mwadimu","Kinarani","Jaribuni","Masindeni", "Mikinduni","Kipini","Ndau")
 vord <- c(2,7,6,5,4,1,9,8,3,10)
@@ -76,10 +71,12 @@ axis(2,at=ytics,labels=c(
   expression(10^2),
   expression(10^3),
   expression(10^4)), las=1,cex.axis=1.25)
-mtext("Age, years",side=1,line=3)
-mtext("Antibody response (MFI-bg)",side=2,line=3)
-mtext("Age-dependent mean response, by community",side=3,line=0.5,adj=0,cex=1)
-mtext('Plasmodium falciparum CSP',side=3,line=2,adj=0,cex=1.25,font=2)
+# mtext("Age, years",side=1,line=3)
+mtext("Antibody response (MFI-bg)",side=2,line=3,cex=1.1)
+mtext("Age-dependent mean response, by community",side=3,line=2.5,adj=0.5,cex=1.1)
+mtext(expression(paste(italic("P. falciparum")," CSP")),side=3,line=0.5,adj=0,cex=1.1,font=1)
+mtext("A",side=3,line=2.5,adj=0,at=-10,cex=1.5,font=2)
+
 
 j <- 1
 for(i in vord){ 
@@ -97,10 +94,10 @@ axis(2,at=ytics,labels=c(
   expression(10^2),
   expression(10^3),
   expression(10^4)), las=1,cex.axis=1.25)
-mtext("Age, years",side=1,line=3)
-mtext("Antibody response (MFI-bg)",side=2,line=3)
-mtext("Age-dependent mean response, by community",side=3,line=0.5,adj=0,cex=1)
-mtext('Plasmodium falciparum MSP-1',side=3,line=2,adj=0,cex=1.25,font=2)
+# mtext("Age, years",side=1,line=3)
+mtext("Antibody response (MFI-bg)",side=2,line=3,cex=1.1)
+# mtext("Age-dependent mean response, by community",side=3,line=0.5,adj=0,cex=1)
+mtext(expression(paste(italic("P. falciparum")," MSP-1")),side=3,line=0.5,adj=0,cex=1.1,font=1)
 
 j <- 1
 for(i in vord){ 
@@ -118,10 +115,10 @@ axis(2,at=ytics,labels=c(
   expression(10^2),
   expression(10^3),
   expression(10^4)), las=1,cex.axis=1.25)
-mtext("Age, years",side=1,line=3)
-mtext("Antibody response (MFI-bg)",side=2,line=3)
-mtext("Age-dependent mean response, by community",side=3,line=0.5,adj=0,cex=1)
-mtext('Plasmodium malariae MSP-1',side=3,line=2,adj=0,cex=1.25,font=2)
+mtext("Age, years",side=1,line=3,cex=1.1)
+mtext("Antibody response (MFI-bg)",side=2,line=3,cex=1.1)
+# mtext("Age-dependent mean response, by community",side=3,line=0.5,adj=0,cex=1)
+mtext(expression(paste(italic("P. malariae")," MSP-1")),side=3,line=0.5,adj=0,cex=1.1,font=1)
 
 j <- 1
 for(i in vord){ 
@@ -135,7 +132,7 @@ for(i in vord){
 
 xtics <- 1:10
 
-# CSP
+# P. falciparum CSP
 plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=c(1,4.25),bty="n")
 axis(2,at=ytics,labels=c(
@@ -145,14 +142,15 @@ axis(2,at=ytics,labels=c(
   expression(10^4)), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
 # mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Mean response, by community",side=3,line=0.5,adj=0)
-mtext("Community",side=1,line=3)
+mtext("Mean response, by community",side=3,line=2.5,adj=0.5,cex=1.1)
+# mtext("Community",side=1,line=3)
+
 
 arrows(x0=1:10,y0=cspEYxs[2,vord],y1=cspEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,cspEYxs[1,vord],pch=19,col=cols)
 
 
-# P. falciparum
+# P. falciparum MSP-1
 plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=c(1,4.25),bty="n")
 axis(2,at=ytics,labels=c(
@@ -161,9 +159,8 @@ axis(2,at=ytics,labels=c(
   expression(10^3),
   expression(10^4)), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
-# mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Mean response, by community",side=3,line=0.5,adj=0)
-mtext("Community",side=1,line=3)
+# mtext("Mean response, by community",side=3,line=0.5,adj=0)
+# mtext("Community",side=1,line=3)
 
 arrows(x0=1:10,y0=msp1pfEYxs[2,vord],y1=msp1pfEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,msp1pfEYxs[1,vord],pch=19,col=cols)
@@ -178,9 +175,9 @@ axis(2,at=ytics,labels=c(
   expression(10^3),
   expression(10^4)), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
-# mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Mean response, by community",side=3,line=0.5,adj=0)
-mtext("Community",side=1,line=3)
+# mtext("Mean response, by community",side=3,line=0.5,adj=0)
+mtext("Community",side=1,line=3,cex=1.1)
+
 
 arrows(x0=1:10,y0=msp1pmEYxs[2,vord],y1=msp1pmEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,msp1pmEYxs[1,vord],pch=19,col=cols)
@@ -197,9 +194,13 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=range(ytics),bty="n")
 axis(1,at=xtics,las=1,cex.axis=1.5)
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
-mtext("Age-dependent seroprevalence, by community",side=3,line=0.5,adj=0,cex=1)
-mtext("Age, years",side=1,line=3)
-mtext("Seroprevalence (%)",side=2,line=3)
+mtext("Age-dependent seroprevalence, by community",side=3,line=2.5,adj=0.5,cex=1.1)
+# mtext("Age, years",side=1,line=3)
+mtext("Seroprevalence (%)",side=2,line=3,cex=1.1)
+mtext(expression(paste(italic("P. falciparum")," CSP")),side=3,line=0.5,adj=0,cex=1.1,font=1)
+mtext("B",side=3,line=2.5,adj=0,at=-15,cex=1.5,font=2)
+
+
 j <- 1
 for(i in vord){ 
   lines(pcsp_curves[[i]]$Age,pcsp_curves[[i]]$pY,col=cols[j])
@@ -214,9 +215,11 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=range(ytics),bty="n")
 axis(1,at=xtics,las=1,cex.axis=1.5)
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
-mtext("Age-dependent seroprevalence, by community",side=3,line=0.5,adj=0,cex=1)
-mtext("Age, years",side=1,line=3)
-mtext("Seroprevalence (%)",side=2,line=3)
+# mtext("Age-dependent seroprevalence, by community",side=3,line=0.5,adj=0,cex=1)
+# mtext("Age, years",side=1,line=3)
+mtext("Seroprevalence (%)",side=2,line=3,cex=1.1)
+mtext(expression(paste(italic("P. falciparum")," MSP-1")),side=3,line=0.5,adj=0,cex=1.1,font=1)
+
 j <- 1
 for(i in vord){ 
   lines(pmsp1pf_curves[[i]]$Age,pmsp1pf_curves[[i]]$pY,col=cols[j])
@@ -231,9 +234,11 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=range(ytics),bty="n")
 axis(1,at=xtics,las=1,cex.axis=1.5)
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
-mtext("Age-dependent seroprevalence, by community",side=3,line=0.5,adj=0,cex=1)
-mtext("Age, years",side=1,line=3)
-mtext("Seroprevalence (%)",side=2,line=3)
+# mtext("Age-dependent seroprevalence, by community",side=3,line=0.5,adj=0,cex=1)
+mtext("Age, years",side=1,line=3,cex=1.1)
+mtext("Seroprevalence (%)",side=2,line=3,cex=1.1)
+mtext(expression(paste(italic("P. malariae")," MSP-1")),side=3,line=0.5,adj=0,cex=1.1,font=1)
+
 j <- 1
 for(i in vord){ 
   lines(pmsp1pm_curves[[i]]$Age,pmsp1pm_curves[[i]]$pY,col=cols[j])
@@ -250,9 +255,8 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=range(ytics),bty="n")
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
-# mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Seroprevalence, by community",side=3,line=0.5,adj=0)
-mtext("Community",side=1,line=3)
+mtext("Seroprevalence, by community",side=3,line=2.5,adj=0.5,cex=1.1)
+# mtext("Community",side=1,line=3)
 
 arrows(x0=1:10,y0=pcspEYxs[2,vord],y1=pcspEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,pcspEYxs[1,vord],pch=19,col=cols)
@@ -263,9 +267,8 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=range(ytics),bty="n")
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
-# mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Seroprevalence, by community",side=3,line=0.5,adj=0)
-mtext("Community",side=1,line=3)
+# mtext("Seroprevalence, by community",side=3,line=0.5,adj=0)
+# mtext("Community",side=1,line=3)
 
 arrows(x0=1:10,y0=pmsp1pfEYxs[2,vord],y1=pmsp1pfEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,pmsp1pfEYxs[1,vord],pch=19,col=cols)
@@ -276,24 +279,11 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=range(ytics),bty="n")
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
-# mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Seroprevalence, by community",side=3,line=0.5,adj=0)
-mtext("Community",side=1,line=3)
+# mtext("Seroprevalence, by community",side=3,line=0.5,adj=0)
+mtext("Community",side=1,line=3,cex=1.1)
 
 arrows(x0=1:10,y0=pmsp1pmEYxs[2,vord],y1=pmsp1pmEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,pmsp1pmEYxs[1,vord],pch=19,col=cols)
-
-#--------------------------------
-# add a community name key along the bottom
-#--------------------------------
-# resetplot <- function() {
-#   layout(mat=matrix(1))
-#   par(mfrow=c(1, 1), oma=rep(0, 4), mar=rep(0, 4), new=TRUE)
-#   plot(0:1, 0:1, type="n", xlab="", ylab="", axes=FALSE)
-# }
-# resetplot()
-# legend('bottom',legend=paste(1:10,vordn),text.col=cols,ncol=5,bty="n",xpd=NA)
-
 
 #--------------------------------
 # add a community name key along the bottom

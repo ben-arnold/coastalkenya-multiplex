@@ -1,7 +1,7 @@
 
-R version 3.3.3 (2017-03-06) -- "Another Canoe"
-Copyright (C) 2017 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
+R version 3.5.3 (2019-03-11) -- "Great Truth"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -124,7 +124,7 @@ alternative hypothesis: true location shift is not equal to 0
 > mtext("Antibody response (MFI-bg)",side=2,line=3)
 > mtext(c("ICT neg","ICT pos"),side=1,line=0,at=xs,cex=1.25,col=c(cteal,corange))
 > mtext(paste("n =",format(wb123n,big.mark = ",")),side=1,line=1.5,at=xs,cex=0.9,col="gray20")
-> mtext("Wb123",side=3,line=1,adj=0,cex=1.25)
+> mtext("Wb123",side=3,line=0,adj=0,cex=1.25)
 > 
 > 
 > # Bm14
@@ -189,4 +189,4 @@ null device
 > 
 > proc.time()
    user  system elapsed 
-  2.480   0.122   2.641 
+  3.460   0.185   3.658 

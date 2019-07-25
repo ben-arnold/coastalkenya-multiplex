@@ -37,12 +37,6 @@ cols <- c(cblack,"gray40",cred,corange,cchartr,cgreen,cteal,cblue,cmagent, cbPal
 # load(file="~/dropbox/coastalkenya/results/raw/coastal-malaria.RData")
 load(file="~/dropbox/coastalkenya/results/raw/coastal-vaccines.RData")
 
-
-# order all villages in this figure
-# by CSP seroprevalence
-# vord <- order(pcspEYxs[1,],decreasing=TRUE)
-# vordn <- unique(d$cname[order(d$community)])[vord]
-
 # order all villages by county and from south to north
 vordn <- c("Kimorigo","Makwenyeni","Mirihini","Mwadimu","Kinarani","Jaribuni","Masindeni", "Mikinduni","Kipini","Ndau")
 vord <- c(2,7,6,5,4,1,9,8,3,10)
@@ -68,10 +62,10 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=range(ytics),bty="n")
 axis(1,at=xtics,las=1,cex.axis=1.5)
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
-mtext("Age-dependent seroprotection, by community",side=3,line=0,adj=0,cex=1)
-mtext("Age, years",side=1,line=3)
-mtext("Seroprotection (%)",side=2,line=3)
-mtext("Measles MV-N",side=3,line=2.25,adj=0,at=-10,cex=1.25,font=2)
+mtext("Age-dependent seroprotection, by community",side=3,line=2.5,adj=0.5,cex=1.1)
+# mtext("Age, years",side=1,line=3)
+mtext("Seroprotection (%)",side=2,line=3,cex=1.1)
+mtext("Measles MV-N",side=3,line=0.5,adj=0,at=0,cex=1.1,font=1)
 j <- 1
 for(i in vord){ 
   lines(pmea_curves[[i]]$Age,pmea_curves[[i]]$pY,col=cols[j])
@@ -86,10 +80,10 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=range(ytics),bty="n")
 axis(1,at=xtics,las=1,cex.axis=1.5)
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
-mtext("Age-dependent seroprotection, by community",side=3,line=0,adj=0,cex=1)
-mtext("Age, years",side=1,line=3)
-mtext("Seroprotection (%)",side=2,line=3)
-mtext("Diphtheria toxoid",side=3,line=2.25,adj=0,at=-10,cex=1.25,font=2)
+# mtext("Age-dependent seroprotection, by community",side=3,line=0,adj=0,cex=1)
+# mtext("Age, years",side=1,line=3)
+mtext("Seroprotection (%)",side=2,line=3,cex=1.1)
+mtext("Diphtheria toxoid",side=3,line=0.5,adj=0,at=0,cex=1.1,font=1)
 j <- 1
 for(i in vord){ 
   lines(pdip_curves[[i]]$Age,pdip_curves[[i]]$pY,col=cols[j])
@@ -104,10 +98,10 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
      xlim=range(xtics),ylim=range(ytics),bty="n")
 axis(1,at=xtics,las=1,cex.axis=1.5)
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
-mtext("Age-dependent seroprotection, by community",side=3,line=0,adj=0,cex=1)
-mtext("Age, years",side=1,line=3)
-mtext("Seroprotection (%)",side=2,line=3)
-mtext("Tetanus toxoid",side=3,line=2.25,adj=0,at=-10,cex=1.25,font=2)
+# mtext("Age-dependent seroprotection, by community",side=3,line=0,adj=0,cex=1)
+mtext("Age, years",side=1,line=3,cex=1.1)
+mtext("Seroprotection (%)",side=2,line=3,cex=1.1)
+mtext("Tetanus toxoid",side=3,line=0.5,adj=0,at=0,cex=1.1,font=1)
 j <- 1
 for(i in vord){ 
   lines(ptet_curves[[i]]$Age,ptet_curves[[i]]$pY,col=cols[j])
@@ -126,8 +120,8 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
 # mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Seroprotection, by community",side=3,line=0.5,adj=0)
-mtext("Community",side=1,line=3)
+mtext("Seroprotection, by community",side=3,line=2.5,adj=0,cex=1.1)
+# mtext("Community",side=1,line=3)
 
 arrows(x0=1:10,y0=pmeaEYxs[2,vord],y1=pmeaEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,pmeaEYxs[1,vord],pch=19,col=cols)
@@ -139,17 +133,17 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
 # mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Seroprotection and partial protection, by community",side=3,line=0.5,adj=0)
-mtext("Community",side=1,line=3)
+# mtext("Seroprotection and partial protection, by community",side=3,line=0.5,adj=0)
+# mtext("Community",side=1,line=3)
 
 arrows(x0=1:10,y0=pdipEYxs[2,vord],y1=pdipEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,pdipEYxs[1,vord],pch=19,col=cols)
-text(1,0.45,"Seroprotection",adj=0)
+text(1,0.45,"Seroprotection",adj=0,cex=1.2,col="gray20")
 
   # partial protection
   arrows(x0=1:10,y0=ppdipEYxs[2,vord],y1=ppdipEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
   points(1:10,ppdipEYxs[1,vord],pch=21,col=cols,bg="white")
-  text(1,0.95,"Partial protection",adj=0)
+  text(1,0.95,"Partial protection",adj=0,cex=1.2,col="gray20")
   
 
 # Tetanus
@@ -158,8 +152,8 @@ plot(1,1,type="n",xaxt="n",yaxt="n",xlab="",ylab="",
 axis(2,at=ytics,labels=sprintf("%1.0f",ytics*100), las=1,cex.axis=1.25)
 mtext(1:10,side=1,line=0,at=1:10,col=cols)
 # mtext(vordn,side=1,line=0,at=1:10,adj=1,col=cols,las=2)
-mtext("Seroprotection, by community",side=3,line=0.5,adj=0)
-mtext("Community",side=1,line=3)
+# mtext("Seroprotection, by community",side=3,line=0.5,adj=0)
+mtext("Community",side=1,line=3,cex=1.1)
 
 arrows(x0=1:10,y0=ptetEYxs[2,vord],y1=ptetEYxs[3,vord],angle=90,col=cols,code=3,length=0.05)
 points(1:10,ptetEYxs[1,vord],pch=19,col=cols)

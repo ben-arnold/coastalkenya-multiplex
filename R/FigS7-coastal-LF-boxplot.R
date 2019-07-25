@@ -82,7 +82,7 @@ axis(2,at=ytics,labels=c(
 mtext("Antibody response (MFI-bg)",side=2,line=3)
 mtext(c("ICT neg","ICT pos"),side=1,line=0,at=xs,cex=1.25,col=c(cteal,corange))
 mtext(paste("n =",format(wb123n,big.mark = ",")),side=1,line=1.5,at=xs,cex=0.9,col="gray20")
-mtext("Wb123",side=3,line=1,adj=0,cex=1.25)
+mtext("Wb123",side=3,line=0,adj=0,cex=1.25)
 
 
 # Bm14
